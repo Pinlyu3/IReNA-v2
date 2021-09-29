@@ -6,7 +6,7 @@
  <img src="Summary.png" width="450" height = "450"/>
  </div>
 
-## STEP 0:Before following the IReNA-v2 analysis pipline
+## STEP 0:Before following the IReNA-v2 analysis pipeline
 The pipeline developed in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects and ArchR objects can be downloaded by google drive: [Example datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
 
 ### S0-1 load required packages
