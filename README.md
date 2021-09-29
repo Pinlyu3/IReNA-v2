@@ -80,7 +80,72 @@ To calculate the footprint score for each motif region in each cell type, we re-
 
 We further removed the motifs binding region for each cell type if the expression level of their corresponding TFs are not enriched in that cell type (from Step1).
 
+``` r
+load('Early_RPCS2_footprints_cl')
+load('Early_EN_footprints_cl')
+load('Early_ACHC_footprints_cl')
+load('Early_Cone_footprints_cl')
+load('Early_RGC_footprints_cl')
 
+
+#### filtered motifs ########
+
+library('GenomicRanges')
+library("TFBSTools")
+library("motifmatchr")
+
+setwd('/zp1/data/plyu3/Finally_retinal_dev_202009/Figure5')
+load(file='out_all_ext')
+out_all_ext_add = data.frame(Motif = 'Atoh7_Chip', TFs='Atoh7')
+out_all_ext = rbind(out_all_ext,out_all_ext_add)
+
+####
+
+setwd('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009')
+load('All_peaks_list_202009')
+load('mm10_TSS_GR_all_202009')
+load('E14_E16_new_proj_early_p2g')
+load('Early_Diff_Genes_tab_202103')
+
+summary(abs(E14_E16_new_proj_early_p2g$Correlation))
+summary(abs(E14_E16_new_proj_early_p2g$FDR))
+
+RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
+E_N_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$E_N >0)]
+AC_HC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' >0)]
+RGC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RGC >0)]
+Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
+
+All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone_sp_Genes)
+All_genes_test = All_genes_test[!duplicated(All_genes_test)]
+
+early_peak_gene_list = Selection_peaks_for_one(All_peaks_list,All_genes_test,E14_E16_new_proj_early_p2g,distance_F=100000,mm10_TSS_GR_all)
+
+
+peak_gene_list = early_peak_gene_list
+
+Output_CARs = function(peak_gene_list){
+	#####
+	temp1 = peak_gene_list[[1]]
+	#####
+	out1 = data.frame(DEGs = temp1$gene_name,CARs=temp1$peaks,Class='TSS',Correlation=as.character('TSS'))
+	#####
+	temp2 = peak_gene_list[[2]]
+	#####
+	out2 = data.frame(DEGs = temp2$gene_name,CARs=temp2$peaks,Class='GeneBody',Correlation=as.character(temp2$Correlation))
+	#####
+	temp3 = peak_gene_list[[3]]
+	#####
+	out3 = data.frame(DEGs = temp3$gene_name,CARs=temp3$peaks,Class='Intergenic',Correlation=as.character(temp3$Correlation))
+	#####
+	out = rbind(out1,out2,out3)
+	#####
+	return(out)
+}
+
+DEGs_CAR_table = Output_CARs(peak_gene_list)
+
+```
 
 ## STEP 5:Calculating gene-gene correlation
 We calculated the expression correlations between all the expressed genes at the single-cell level. First, we extracted the cell-by-matrix from Seurat objects and filtered out the non-expressed genes in the matrix (rowSums < 10). Then we applied the MAGIC software to impute missing values and recover the gene interactions with the cell-by-gene matrix. The output matrix from MAGIC was used to calculate gene-gene correlation using the function ‘cor’ in R.  To identify the significant gene-gene correlations, we ranked all the gene-gene correlations (~1X10e8). The top 2.5% correlations were treated as significant positive correlations (p < 0.025) and the bottom 2.5% correlations were treated as significant negative correlations  (p < 0.025).
