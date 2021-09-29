@@ -1,5 +1,5 @@
 # IReNA-v2
- Constructing gene regulatory networks by integrating scRNA-seq and scATAC-seq data
+### Constructing gene regulatory networks by integrating scRNA-seq and scATAC-seq data
 
 
  <div align="center">
@@ -7,4 +7,25 @@
  </div>
 
 
-## STEP 1: Get ligand_target_matrix and receptor_target_matrix
+## STEP 1:
+
+
+##
+
+
+##
+
+
+##
+
+
+##
+
+
+##
+
+
+##
+
+
+##
