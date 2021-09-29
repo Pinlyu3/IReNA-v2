@@ -19,13 +19,59 @@ library(ArchR)
 ## STEP 1:Selecting candidate genes
 The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In constructing the GRNs of progenitors transition, the following parameters of ‘FindMarkers’ were used: min.pct = 0.05, logfc.threshold = 0.20, only.pos = TRUE, p-adjust < 0.01. In constructing GRNs regulating neurogenesis, the following parameters of ‘FindMarkers’ were used: min.pct = 0.1, logfc.threshold = 0.25, only.pos = TRUE and p-adjust < 0.01.
 
+### S0-1 load required packages
+``` r
+library(Seurat)
+library(ArchR)
+```
+
 
 ## STEP 2:Identifying significant peak-to-gene links
-We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression. Finally, we identified the significant peak-to-gene links with the following cutoff: abs(correlation) > 0.2 and fdr < 1e-6.
+We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression.
+
+``` r
+load('E14_E16_RNA_seurat')
+
+library(future)
+plan("multiprocess", workers = 30)
+options(future.globals.maxSize = 10000 * 1024^2)
+
+Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.2)
+
+```
 
 ## STEP 3:Identifying the potential cis-regulatory elements for each candidate gene
 We identified potential cis-regulatory elements for each candidate gene based on their location and the peak-to-gene links from Step2. We first classified all peaks into three categories according to their genomic location related to their potential target genes: 1) Promoter. 2) Gene body. 3) Intergenic. For the peaks in the promoter region,we treated all of them as correlated accessible chromatin regions (CARs) of their overlapping target genes. For the peaks in the gene body region, we defined them as CARs of their overlapping genes if they met the following criteria: 1) the distance between the peak and the TSS of its overlapping gene is < 100kb. 2) the links between the peak and its overlapping gene is significant.  For the peaks in the intergenic region, we first find their target genes and construct the peak-gene pairs if the target genes’ TSS are located within the upstream 100kb or downstream 100 kb of the intergenic peaks. Then we keep the peak-gene pairs if their peak-to-gene links are significant in step2. These peaks were identified as CARs of their gene pairs.
 
+``` r
+files = c(
+	'/zp1/data/plyu3/Arrow_Project/E11_P8_combine_202010/ArrowFiles/E14.arrow',
+	'/zp1/data/plyu3/Arrow_Project/E11_P8_combine_202010/ArrowFiles/E16.arrow'
+	)
+names(files) = c('E14','E16')
+
+
+E14_E16_new_proj = ArchRProject(
+  ArrowFiles = files,
+  outputDirectory = "E14_E16_combine_202010",
+  copyArrows = FALSE
+)
+
+getAvailableMatrices(E14_E16_new_proj)
+
+E14_E16_new_proj_early = ArchR_Filter_proj(E14_E16_new_proj,cellnames)
+
+load('Peak_set_GR_202009')
+
+E14_E16_new_proj_early = addPeakSet_Matrix(E14_E16_new_proj_early,Peak_set_GR)
+
+E14_E16_new_proj_early = Process_project(E14_E16_new_proj_early)
+
+E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
+
+E14_E16_new_proj_early_Pmat = ArchR_Get_the_peak_matrix(E14_E16_new_proj_early,binarize=T)
+
+```
 
 ## STEP 4:Predicting cell-type specific TFs binding in cis-regulatory elements
 With the cis-regulatory elements identified in Step 3, we next predicted the TF binding in these elements for each cell type with the PWMs extracted from TRANSFAC database. Firstly, we searching the motifs in all the cis-regulatory elements with the function ‘matchMotifs (p.cutoff = 5e-05)’ from the motifmatchr package. Then we filtered these motif regions according to their footprint score and their corresponding TF’s expression for each cell type.
