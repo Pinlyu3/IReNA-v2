@@ -158,6 +158,7 @@ To calculate the footprint score for each motif region in each cell type, we re-
 ``` r
 library('readr')
 library('GenomicRanges')
+source('Step4_functions.R')
 
 ### First read the fragment from the cellranger-atac ####
 ### 
@@ -172,19 +173,7 @@ Cell_names_list = split(E14_E16_ATAC_seurat$cell_id,E14_E16_ATAC_seurat$New_cell
 #[1] "AC/HC"  "Cone"   "E_N"    "RGC"    "RPC_S2"
 
 ### Load the total fragments for each time point ###
-Read_fragment_to_GR <- function(x){
-    tab <- read_tsv(x,col_names = F)
-    GR <- GRanges(seqnames=tab$X1,ranges=IRanges(start=tab$X2,end=tab$X3),index=tab$X4,dup=tab$X5)
-    return(GR)
-}
 
-unlist_fun <- function(GR_list){
-	GR_Ori = GR_list[[1]]
-	for(i in 2:length(GR_list)){
-		GR_Ori = c(GR_Ori,GR_list[[i]])
-	}
-	return(GR_Ori)
-}
 
 Fragment_list = list()
 tags = c('E14','E16')
