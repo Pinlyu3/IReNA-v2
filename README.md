@@ -156,7 +156,107 @@ To calculate the footprint score for each motif region in each cell type, we re-
 ### STEP 4.1：Generate scATAC-seq fragments for each cell type :
 
 ``` r
+library('readr')
+library('GenomicRanges')
 
+### First read the fragment from the cellranger-atac ####
+### 
+
+### Get the single cell names for each cell type ###
+### Cell_names_list ####
+library('Seurat')
+load('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009/E14_E16_ATAC_seurat')
+Cell_names_list = split(E14_E16_ATAC_seurat$cell_id,E14_E16_ATAC_seurat$New_celltypes)
+
+#names(Cell_names_list)
+#[1] "AC/HC"  "Cone"   "E_N"    "RGC"    "RPC_S2"
+
+### Load the total fragments for each time point ###
+Read_fragment_to_GR <- function(x){
+    tab <- read_tsv(x,col_names = F)
+    GR <- GRanges(seqnames=tab$X1,ranges=IRanges(start=tab$X2,end=tab$X3),index=tab$X4,dup=tab$X5)
+    return(GR)
+}
+
+unlist_fun <- function(GR_list){
+	GR_Ori = GR_list[[1]]
+	for(i in 2:length(GR_list)){
+		GR_Ori = c(GR_Ori,GR_list[[i]])
+	}
+	return(GR_Ori)
+}
+
+Fragment_list = list()
+tags = c('E14','E16')
+for(i in tags){
+    tag = i
+    file = 'fragments_cl.tsv'
+    print(i)
+    folder = paste('/zp1/data/plyu3/scATACseq_new_clean/',tag,sep='')
+    print(folder)
+    setwd(folder)
+    tab_GR <- Read_fragment_to_GR(file)
+    Fragment_list = c(Fragment_list,tab_GR)
+}
+names(Fragment_list) = tags
+
+E14_E16_Fragment_list = Fragment_list
+
+setwd('/zp1/data/plyu3/scATACseq_new_clean/')
+
+save(E14_E16_Fragment_list,file='E14_E16_Fragment_list')
+
+## E14_E16_Fragment_list provided in google drive ###
+
+load('E14_E16_Fragment_list')
+
+Fragments_filter = E14_E16_Fragment_list
+
+### extract fragment for each cell type ###
+
+Total_insertion_list = list()
+
+for(i in 1:length(Cell_names_list)){
+	print(paste('i=',i))
+	tmp_name = names(Cell_names_list)[i]
+	tmp_name_list = Cell_names_list[[i]]
+	print(tmp_name)
+	### #####
+	tmp_times = sapply(strsplit(as.character(tmp_name_list),split=':'),function(x) x[[1]])
+	tmp_indexs = sapply(strsplit(as.character(tmp_name_list),split=':'),function(x) x[[2]])
+	print(levels(as.factor(tmp_times)))
+	### split cell names by time ######
+	print(tmp_name)
+	print(table(tmp_times))
+	tmp_indexs_list = split(tmp_indexs,tmp_times)
+	###
+	tmp_GR_list = list()
+	###
+	for(j in 1:length(tmp_indexs_list)){
+		print(paste('j=',j))
+		####
+		tmp_times_tmp = names(tmp_indexs_list)[j]
+		####
+		print(names(tmp_indexs_list)[j])
+		####
+		tmp_indexs_tmp = tmp_indexs_list[[j]]
+		####
+		k_tmptmp = which(names(Fragments_filter) == tmp_times_tmp)
+		####
+		tmp_fragments = Fragments_filter[[k_tmptmp]]
+		####
+		tmp_GR = tmp_fragments[which(tmp_fragments$index %in% tmp_indexs_tmp == T)]
+		####
+		print(length(tmp_GR))
+		####
+		tmp_GR_list = c(tmp_GR_list,list(tmp_GR))
+		####
+		####
+	}
+	tmp_GR_list = unlist_fun(tmp_GR_list)
+	###
+	Total_insertion_list = c(Total_insertion_list,list(tmp_GR_list))
+}
 
 ```
 ### STEP 4.2：Cell-type specific fragments to pair-end bam files:
