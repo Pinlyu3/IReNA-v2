@@ -18,7 +18,7 @@ library(ArchR)
 
 ## STEP 1: Selecting candidate genes
 The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone:Cone, 
-AC/HC
+AC/HC.
 
 ``` r
 load('E14_E16_RNA_seurat')
@@ -47,13 +47,28 @@ save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
 We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression.
 
 ``` r
-load('E14_E16_RNA_seurat')
+library(ArchR)
 
-library(future)
-plan("multiprocess", workers = 30)
-options(future.globals.maxSize = 10000 * 1024^2)
 
-Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.2)
+
+files = c(
+	'/E14.arrow',
+	'/E16.arrow'
+	)
+names(files) = c('E14','E16')
+
+E14_E16_new_proj = ArchRProject(
+  ArrowFiles = files, 
+  outputDirectory = "E14_E16_combine_202010tmp",
+  copyArrows = FALSE
+)
+
+getAvailableMatrices(E14_E16_new_proj)
+
+###
+
+
+###
 
 ```
 
