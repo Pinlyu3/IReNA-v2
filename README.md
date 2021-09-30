@@ -37,7 +37,7 @@ save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
 
 
 
-## STEP 2:Identifying significant peak-to-gene links
+## STEP 2:Identifying significant peak-to-gene links （scRNA-seq & scATAC-seq）
 We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression.
 
 ``` r
@@ -153,7 +153,23 @@ With the cis-regulatory elements identified in Step 3, we next predicted the TF 
 
 To calculate the footprint score for each motif region in each cell type, we re-grouped the insertion fragments based on their origin of cell type and converted these cell-type-specific fragments into bam files using a custom script. Then we fed the bam files to TOBIAS software and obtained the bias-corrected Tn5 signal (log2(obs/exp)) with the default parameters except: ATACorrect --read_shift 0 0. Next, we calculated footprint scores including  NC, NL and NR for each motif's binding region. NC indicated the average bias-corrected Tn5 signal in the center of the motif. NL and NR indicated the average bias-corrected Tn5 signal in the left and right flanking regions of the motif, respectively. The flanking region is triple the size of the center region. We kept the motifs with the following criteria: NC < -0.1 and NL > 0.1 and NR > 0.1.
 
+### STEP 4.1：Generate scATAC-seq fragments for each cell type 
+
+``` r
+
+
+```
+
+
+
+
+
+
+
+
 We further removed the motifs binding region for each cell type if the expression level of their corresponding TFs are not enriched in that cell type (from Step1).
+
+
 
 ``` r
 load('Early_RPCS2_footprints_cl')
