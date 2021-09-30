@@ -255,25 +255,56 @@ names(E14_E16_fragments_by_Celltype)[1] = 'ACHC'
 #### covert fragments to bedpe files and save it in the target folder: 
 Output_to_bed_files(E14_E16_fragments_by_Celltype,'/zp1/data/plyu3/Early')
 
-#### this step will generate 5 bedpe files:
-## 
-##
-##
-##
-## 
+#### this step will generate 5 bedpe files for each cell type:
+## RPC_S2_fragments_cl_bamGR_pe.bed
+## RGC_fragments_cl_bamGR_pe.bed
+## E_N_fragments_cl_bamGR_pe.bed
+## ACHC_fragments_cl_bamGR_pe.bed
+## Cone_fragments_cl_bamGR_pe.bed
+
+#### covert bedpe files to bamfiles with bedtools, sort and index the bams with samtools:
+
+for(i in names(E14_E16_fragments_by_Celltype)){
+	print(i)
+	shell= paste("bedtools bedpetobam -i ",i,"_fragments_cl_bamGR_pe.bed -g /zp1/data/plyu3/SoftWare/mm10_datasets/chrom_mm10.sizes > ",i,"_fragments_cl_bamGR_pe.bam" ,sep="")
+	system(shell,wait=TRUE)
+}
+
+for(i in names(E14_E16_fragments_by_Celltype)){
+	print(i)
+	shell= (paste("samtools sort -o ",i,"_fragments_cl_bamGR_pe_s.bam ",i,"_fragments_cl_bamGR_pe.bam",sep=""))
+	system(shell,wait=TRUE)
+}
+
+for(i in names(E14_E16_fragments_by_Celltype)){
+	print(i)
+	shell= paste("samtools index ",i,"_fragments_cl_bamGR_pe_s.bam",sep="")
+	system(shell,wait=TRUE)
+}
+
+### this step will finall generated 5 sorted and indexed bam files:
+
+## ACHC_fragments_cl_bamGR_pe_s.bam
+## Cone_fragments_cl_bamGR_pe_s.bam
+## E_N_fragments_cl_bamGR_pe_s.bam
+## RGC_fragments_cl_bamGR_pe_s.bam
+## RPC_S2_fragments_cl_bamGR_pe_s.bam
 
 ```
 
 
-### STEP 4.3：Covert pair-end bam files to TOBIAS normalized Signal
+### STEP 4.3：Covert pair-end bam files to TOBIAS normalized signal
 
 ``` r
-### shell ###
-nohup TOBIAS ATACorrect --read_shift -1 -1 --bam ACHC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir ACHC_res --cores 4 &
-nohup TOBIAS ATACorrect --read_shift -1 -1 --bam Cone_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir Cone_res --cores 4 &
-nohup TOBIAS ATACorrect --read_shift -1 -1 --bam E_N_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir EN_res --cores 4 &
-nohup TOBIAS ATACorrect --read_shift -1 -1 --bam RGC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RGC_res --cores 4 &
-nohup TOBIAS ATACorrect --read_shift -1 -1 --bam RPC_S2_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RPCS2_res --cores 4 &
+### run TOBIAS ####
+### the insertion sites for each fragment file output from the cellranger-atac have already been corrected #####
+### change the parameter of --read_shift ####
+
+nohup TOBIAS ATACorrect --read_shift 0 0 --bam ACHC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir ACHC_res --cores 4 &
+nohup TOBIAS ATACorrect --read_shift 0 0 --bam Cone_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir Cone_res --cores 4 &
+nohup TOBIAS ATACorrect --read_shift 0 0 --bam E_N_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir EN_res --cores 4 &
+nohup TOBIAS ATACorrect --read_shift 0 0 --bam RGC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RGC_res --cores 4 &
+nohup TOBIAS ATACorrect --read_shift 0 0 --bam RPC_S2_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RPCS2_res --cores 4 &
 
 ```
 

@@ -53,3 +53,43 @@ Convert_to_bedpe <- function(gr_list){
     return(df)
 }
 
+
+###
+Output_to_bed_files = function(Fragment_list_cl,folder){
+	tags = names(Fragment_list_cl)
+	### to bam files ###
+	fragments_cl_bamGR_list = list()
+	for(i in 1:length(Fragment_list_cl)){
+    	print(i)
+    	temp_Fragment = Fragment_list_cl[[i]]
+    	temp_Fragment$Reads = paste(tags[i],1:length(temp_Fragment),sep='_')
+    	temp_Fragment_bamGR = fragments_to_bam_GR(temp_Fragment)
+    	fragments_cl_bamGR_list = c(fragments_cl_bamGR_list,list(temp_Fragment_bamGR))
+	}
+	###
+	for(i in 1:length(fragments_cl_bamGR_list)){
+    	print(i)
+    	library('readr')
+    	library(tibble)
+    	setwd(folder)
+    	FN = paste(tags[i],"fragments_cl_bamGR_pe.bed",sep='_')
+    	print(FN)
+    	fragments_cl_bamGR_tab = Convert_to_bedpe(fragments_cl_bamGR_list[[i]])
+    	print(head(fragments_cl_bamGR_tab))
+    	write_tsv(fragments_cl_bamGR_tab, path=FN, col_names= FALSE)
+	}
+}
+
+
+#####
+
+Check_normalized_Signal <- function(file,savefile){
+	library(rtracklayer)
+	temp_bw = import.bw(file)
+	print(summary(width(temp_bw)))
+	print(summary(temp_bw$score))
+	setwd('/zp1/data/plyu3/Human_scATACseq_new/scATAC/Hint/All_normalized')
+	saveRDS(temp_bw,file=savefile)
+}
+
+
