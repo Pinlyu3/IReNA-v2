@@ -6,8 +6,8 @@
  <img src="Summary.png" width="450" height = "450"/>
  </div>
 
-## STEP 0:Before following the IReNA-v2 analysis pipeline
-The pipeline developed in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects and ArchR objects can be downloaded by google drive: [Example datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
+## STEP 0: Before following the IReNA-v2 analysis pipeline
+The pipeline can be run in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects and ArchR objects can be downloaded by google drive: [Example datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
 
 ### S0-1 load required packages
 ``` r
@@ -16,11 +16,10 @@ library(ArchR)
 ```
 
 
-## STEP 1:Selecting candidate genes
+## STEP 1: Selecting candidate genes
 The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone:Cone, 
 AC/HC
 
-### S1-1 
 ``` r
 load('E14_E16_RNA_seurat')
 
@@ -30,6 +29,16 @@ table(Idents(E14_E16_RNA_seurat))
 # E_N    RGC RPC_S2   Cone  AC/HC 
 # 3039   5944  16714   1436   1349 
 
+# call markers 
+library(future)
+plan("multiprocess", workers = 30)
+options(future.globals.maxSize = 10000 * 1024^2)
+
+Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.25)
+
+Early_Diff_Genes = Markers[which(Markers$avg_logFC > 0 & Markers$p_val_adj < 0.01),]
+
+save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
 ```
 
 
