@@ -221,7 +221,6 @@ for(i in 1:length(Cell_names_list)){
 	tmp_name = names(Cell_names_list)[i]
 	tmp_name_list = Cell_names_list[[i]]
 	print(tmp_name)
-	### #####
 	tmp_times = sapply(strsplit(as.character(tmp_name_list),split=':'),function(x) x[[1]])
 	tmp_indexs = sapply(strsplit(as.character(tmp_name_list),split=':'),function(x) x[[2]])
 	print(levels(as.factor(tmp_times)))
@@ -236,21 +235,15 @@ for(i in 1:length(Cell_names_list)){
 		print(paste('j=',j))
 		####
 		tmp_times_tmp = names(tmp_indexs_list)[j]
-		####
 		print(names(tmp_indexs_list)[j])
 		####
 		tmp_indexs_tmp = tmp_indexs_list[[j]]
-		####
 		k_tmptmp = which(names(Fragments_filter) == tmp_times_tmp)
-		####
 		tmp_fragments = Fragments_filter[[k_tmptmp]]
-		####
 		tmp_GR = tmp_fragments[which(tmp_fragments$index %in% tmp_indexs_tmp == T)]
-		####
 		print(length(tmp_GR))
 		####
 		tmp_GR_list = c(tmp_GR_list,list(tmp_GR))
-		####
 		####
 	}
 	tmp_GR_list = unlist_fun(tmp_GR_list)
@@ -258,7 +251,13 @@ for(i in 1:length(Cell_names_list)){
 	Total_insertion_list = c(Total_insertion_list,list(tmp_GR_list))
 }
 
+names(Total_insertion_list) = names(Cell_names_list)
+E14_E16_fragments_by_Celltype = Total_insertion_list
+save(E14_E16_fragments_by_Celltype,file='E14_E16_fragments_by_Celltype')
+
 ```
+
+
 ### STEP 4.2：Cell-type specific fragments to pair-end bam files:
 ``` r
 
