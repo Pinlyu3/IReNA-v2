@@ -306,6 +306,16 @@ nohup TOBIAS ATACorrect --read_shift 0 0 --bam E_N_fragments_cl_bamGR_pe_s.bam -
 nohup TOBIAS ATACorrect --read_shift 0 0 --bam RGC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RGC_res --cores 4 &
 nohup TOBIAS ATACorrect --read_shift 0 0 --bam RPC_S2_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir RPCS2_res --cores 4 &
 
+
+#### This step will output normalized insertion signal for each cell types
+#### Provided in google drive
+
+## RPC_S2_fragments_cl_bamGR_pe_s_corrected.bw
+## E_N_fragments_cl_bamGR_pe_s_corrected.bw
+## RGC_fragments_cl_bamGR_pe_s_corrected.bw
+## Cone_fragments_cl_bamGR_pe_s_corrected.bw
+## ACHC_fragments_cl_bamGR_pe_s_corrected.bw
+
 ```
 
 
