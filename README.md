@@ -322,7 +322,7 @@ nohup TOBIAS ATACorrect --read_shift 0 0 --bam RPC_S2_fragments_cl_bamGR_pe_s.ba
 
 ``` r
 
-### first convert normalized bw files to GRanges and save ######
+### first convert normalized bw files to GRanges and save/output ######
 
 file = 'RPC_S2_fragments_cl_bamGR_pe_s_corrected.bw'
 savefile = 'Early_RPCS2_signal'
@@ -343,7 +343,6 @@ Check_normalized_Signal(file,savefile)
 file = 'ACHC_fragments_cl_bamGR_pe_s_corrected.bw'
 savefile = 'Early_ACHC_signal'
 Check_normalized_Signal(file,savefile)
-
 
 
 ### Calculate the Motif binding region in all the peaks using motifmatchr #######
@@ -370,23 +369,70 @@ Total_footprint_Motif = matchMotifs(PWM_list_combine_cl,All_peaks_GR,genome = BS
 Total_footprint_Motif_GR = Must_to_GR(Total_footprint_Motif)
 
 ### Total_footprint_Motif_GR are provided in Google drive ####
-
-
 ### filter these motif binding region (Total_footprint_Motif_GR) by footprint scores ######
 
 
+### load the motifs names and their corresponding TFs name ####
+### out_all_ext: col1: Motif col2: TFs ####
+
+load('out_all_ext')
+
+### load the DEGs ####
+setwd('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009')
+load('Early_Diff_Genes_tab_202103')
+
+### First filter out the footprints if their correaponding gene expression are not enriched in their cell type: ####
+### for each cell type, we are only interest in the TFs which enriched in that cell type #####
+
+setwd('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009')
+load('Early_Diff_Genes_tab_202103')
+
+### read signal files #####
+Early_RPCS2_signal  = readRDS('Early_RPCS2_signal')
+Early_EN_signal  = readRDS('Early_EN_signal')
+Early_RGC_signal  = readRDS('Early_RGC_signal')
+Early_Cone_signal  = readRDS('Early_Cone_signal')
+Early_ACHC_signal  = readRDS('Early_ACHC_signal')
+
+### select enriched TFs for each cell type #####
+RPCS2_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'RPC_S2' > 0)]
+EN_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'E_N' > 0)]
+RGC_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'RGC' > 0)]
+Cone_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'Cone' > 0)]
+ACHC_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' > 0)]
 
 
-### 
+#### We removed the motifs binding for each cell type if the expression level of their corresponding TFs are not enriched in that cell type #####
+#### Then we calulated the NC, NL and NR for each motifs binding region with the cell-type specific signal #####
 
-### The step will generate Total_footprint_Motif_GR #####
-### Total_footprint_Motif_GR are provided in google drive #####
+Early_RPCS2_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_RPCS2_signal,RPCS2_TF,out_all_ext)
+Early_EN_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_EN_signal,EN_TF,out_all_ext)
+Early_RGC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_RGC_signal,RGC_TF,out_all_ext)
+Early_Cone_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_Cone_signal,Cone_TF,out_all_ext)
+Early_ACHC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_ACHC_signal,ACHC_TF,out_all_ext)
+
+### Futher filtered TFs bidnding region if their binding score don't meet: NC < -0.1 and NL > 0.1 and NR > 0.1. #####
+
+Early_RPCS2_footprints_cl = Filter_footprints(Early_RPCS2_footprints,delta=0.1)
+Early_EN_footprints_cl = Filter_footprints(Early_EN_footprints,delta=0.1)
+Early_RGC_footprints_cl = Filter_footprints(Early_RGC_footprints,delta=0.1)
+Early_Cone_footprints_cl = Filter_footprints(Early_Cone_footprints,delta=0.1)
+Early_ACHC_footprints_cl = Filter_footprints(Early_ACHC_footprints,delta=0.1)
+
+#### Final: save the results of Step4: #########
+
+save(Early_RPCS2_footprints_cl,file='Early_RPCS2_footprints_cl')
+save(Early_EN_footprints_cl,file='Early_EN_footprints_cl')
+save(Early_RGC_footprints_cl,file='Early_RGC_footprints_cl')
+save(Early_Cone_footprints_cl,file='Early_Cone_footprints_cl')
+save(Early_ACHC_footprints_cl,file='Early_ACHC_footprints_cl')
+
+#### *_footprints_cl are provided in google drive #####
 
 ```
 
 
 
-We further removed the motifs binding region for each cell type if the expression level of their corresponding TFs are not enriched in that cell type (from Step1).
 
 
 
