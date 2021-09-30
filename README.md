@@ -153,8 +153,13 @@ With the cis-regulatory elements identified in Step 3, we next predicted the TF 
 
 To calculate the footprint score for each motif region in each cell type, we re-grouped the insertion fragments based on their origin of cell type and converted these cell-type-specific fragments into bam files using a custom script. Then we fed the bam files to TOBIAS software and obtained the bias-corrected Tn5 signal (log2(obs/exp)) with the default parameters except: ATACorrect --read_shift 0 0. Next, we calculated footprint scores including  NC, NL and NR for each motif's binding region. NC indicated the average bias-corrected Tn5 signal in the center of the motif. NL and NR indicated the average bias-corrected Tn5 signal in the left and right flanking regions of the motif, respectively. The flanking region is triple the size of the center region. We kept the motifs with the following criteria: NC < -0.1 and NL > 0.1 and NR > 0.1.
 
-### STEP 4.1：Generate scATAC-seq fragments for each cell type 
+### STEP 4.1：Generate scATAC-seq fragments for each cell type :
 
+``` r
+
+
+```
+### STEP 4.2：Cell-type specific fragments to pair-end bam files:
 ``` r
 
 
@@ -165,7 +170,6 @@ To calculate the footprint score for each motif region in each cell type, we re-
 
 ``` r
 ### shell ###
-
 nohup TOBIAS ATACorrect --read_shift -1 -1 --bam ACHC_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir ACHC_res --cores 4 &
 nohup TOBIAS ATACorrect --read_shift -1 -1 --bam Cone_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir Cone_res --cores 4 &
 nohup TOBIAS ATACorrect --read_shift -1 -1 --bam E_N_fragments_cl_bamGR_pe_s.bam --genome /zp1/data/plyu3/SoftWare/mm10_datasets/mm10_bowtie_index/Mus_musculus_GRCm38_all.fa --peaks /zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Hint/All_peaks.bed --blacklist /home/plyu3/Script_Supp/scATACseq/ENCFF547MET.bed --outdir EN_res --cores 4 &
