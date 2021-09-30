@@ -20,10 +20,10 @@ load('E14_E16_RNA_seurat')
 Idents(E14_E16_RNA_seurat) <- 'New_celltypes'
 table(Idents(E14_E16_RNA_seurat))
 
-# E_N    RGC RPC_S2   Cone  AC/HC 
-# 3039   5944  16714   1436   1349 
+#> E_N    RGC RPC_S2   Cone  AC/HC 
+#> 3039   5944  16714   1436   1349 
 
-# call markers 
+#> call markers 
 library(future)
 plan("multiprocess", workers = 30)
 options(future.globals.maxSize = 10000 * 1024^2)
@@ -43,12 +43,11 @@ We used the ArchR package to identify the significant peak-to-gene links. First,
 ``` r
 library(ArchR)
 
-
-
 files = c(
 	'/E14.arrow',
 	'/E16.arrow'
 	)
+
 names(files) = c('E14','E16')
 
 E14_E16_new_proj = ArchRProject(
@@ -58,6 +57,36 @@ E14_E16_new_proj = ArchRProject(
 )
 
 getAvailableMatrices(E14_E16_new_proj)
+
+
+E14_E16_new_proj_early = ArchR_Filter_proj(E14_E16_new_proj,cellnames)
+
+### 
+
+E14_E16_new_proj_early <- addHarmony(
+    ArchRProj = E14_E16_new_proj_early,
+    reducedDims = "IterativeLSI",
+    name = "Harmony",
+    groupBy = "Sample"
+)
+
+E14_E16_new_proj_early <- addPeak2GeneLinks(
+    ArchRProj = E14_E16_new_proj_early,
+    reducedDims = "Harmony",
+    useMatrix = "GeneIntegrationMatrix",
+    dimsToUse = 2:30,
+    knnIteration = 1500
+    #### ######
+)
+
+
+### Get peak-gene links ##########
+source('Get_p2g_fun')
+
+E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
+
+head(E14_E16_new_proj_early_p2g)
+
 
 ###
 
@@ -70,11 +99,32 @@ getAvailableMatrices(E14_E16_new_proj)
 We identified potential cis-regulatory elements for each candidate gene based on their location and the peak-to-gene links from Step2. We first classified all peaks into three categories according to their genomic location related to their potential target genes: 1) Promoter. 2) Gene body. 3) Intergenic. For the peaks in the promoter region,we treated all of them as correlated accessible chromatin regions (CARs) of their overlapping target genes. For the peaks in the gene body region, we defined them as CARs of their overlapping genes if they met the following criteria: 1) the distance between the peak and the TSS of its overlapping gene is < 100kb. 2) the links between the peak and its overlapping gene is significant.  For the peaks in the intergenic region, we first find their target genes and construct the peak-gene pairs if the target genes’ TSS are located within the upstream 100kb or downstream 100 kb of the intergenic peaks. Then we keep the peak-gene pairs if their peak-to-gene links are significant in step2. These peaks were identified as CARs of their gene pairs.
 
 ``` r
-files = c(
-	'/zp1/data/plyu3/Arrow_Project/E11_P8_combine_202010/ArrowFiles/E14.arrow',
-	'/zp1/data/plyu3/Arrow_Project/E11_P8_combine_202010/ArrowFiles/E16.arrow'
-	)
-names(files) = c('E14','E16')
+### First load all the peaks #####
+### all the peaks identified in E11-P14 has beed classfied in into three categories： ####
+
+load('All_peaks_list_202009')
+
+names(All_peaks_list)
+
+# [1] "TSS"        "GeneBody"   "Intergenic"
+
+head(All_peaks_list$TSS)
+
+#GRanges object with 6 ranges and 1 metadata column:
+#      seqnames          ranges strand |   gene_name
+#         <Rle>       <IRanges>  <Rle> | <character>
+#  [1]     chr1 3669496-3669995      * |        Xkr4
+#  [2]     chr1 3670374-3672828      * |        Xkr4
+#  [3]     chr1 4496360-4497811      * |       Sox17
+#  [4]     chr1 4784887-4786500      * |      Mrpl15
+#  [5]     chr1 4807201-4809281      * |      Lypla1
+#  [6]     chr1 4807201-4809281      * |     Gm37988
+
+
+
+```
+
+
 
 
 E14_E16_new_proj = ArchRProject(
