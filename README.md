@@ -42,6 +42,13 @@ We used the ArchR package to identify the significant peak-to-gene links. First,
 
 ``` r
 library(ArchR)
+library(GenomicRanges)
+addArchRThreads(threads = 10) 
+addArchRGenome("mm10")
+setwd('/zp1/data/plyu3/Arrow_Project')
+
+
+
 
 files = c(
 	'/E14.arrow',
@@ -123,10 +130,8 @@ head(All_peaks_list$TSS)
 #  [6]     chr1 4807201-4809281      * |     Gm37988
 
 
-### loading the mm10 TSS data ####
-
+### loading the mm10 TSS information ####
 load('mm10_TSS_GR_all_202009')
-
 head(mm10_TSS_GR_all)
 
 #GRanges object with 47729 ranges and 2 metadata columns:
