@@ -15,3 +15,41 @@ unlist_fun <- function(GR_list){
 	return(GR_Ori)
 }
 
+
+### 
+fragments_to_bam_GR <- function(fragments_cl){
+    chr = seqnames(fragments_cl)
+    s = start(fragments_cl)
+    e = end(fragments_cl)
+    GR_plus = GRanges(seqnames=chr,IRanges(s,s+1),strand='+',Reads=fragments_cl$Reads)
+    GR_minus = GRanges(seqnames=chr,IRanges(e-1,e),strand='-',Reads=fragments_cl$Reads)
+    GR <- list(GR_plus,GR_minus)
+    return(GR)
+}
+
+
+###
+Convert_to_bedpe <- function(gr_list){
+	library(tibble)
+	######
+	gr_left = gr_list[[1]]
+	gr_right = gr_list[[2]]
+	######
+	chr1 = as.character(seqnames(gr_left))
+	s1 = start(gr_left)
+	e1 = end(gr_left)
+	######
+	chr2 = as.character(seqnames(gr_right))
+	s2 = start(gr_right)
+	e2 = end(gr_right)
+	######
+	name = gr_left$Reads
+	scores=c(rep(".", length(gr_left)))
+	######
+	strands1=as.character(strand(gr_left))
+	strands2=as.character(strand(gr_right))
+	######
+    df <- tibble(chr1,s1,e1,chr2,s2,e2,name,scores,strands1,strands2)
+    return(df)
+}
+
