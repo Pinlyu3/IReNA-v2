@@ -346,15 +346,40 @@ Check_normalized_Signal(file,savefile)
 
 
 
-### calculate the Motif binding region in all the peaks using motifmatchr #######
+### Calculate the Motif binding region in all the peaks using motifmatchr #######
+
+library('GenomicRanges')
+library("TFBSTools")
+library("motifmatchr")
+
+### load the GRanges of all peaks #####
+load('All_peaks_GR')
+
+### load the motifs pwm matrix #####
+load('PWM_list_combine_cl')
+
+### load the mm10 genome sequence #####
+library(motifmatchr)
+library('BSgenome.Mmusculus.UCSC.mm10.masked')
+
+### find the motifs in the peaks ######
+### convert the results of motifmatchr to a GRanges object ##############
+
+Total_footprint_Motif = matchMotifs(PWM_list_combine_cl,All_peaks_GR,genome = BSgenome.Mmusculus.UCSC.mm10.masked,out='positions',p.cutoff = 5e-05)
+
+Total_footprint_Motif_GR = Must_to_GR(Total_footprint_Motif)
+
+### Total_footprint_Motif_GR are provided in Google drive ####
+
+
+### filter these motif binding region (Total_footprint_Motif_GR) by footprint scores ######
 
 
 
 
+### 
 
-
-
-### the step will generate Total_footprint_Motif_GR #####
+### The step will generate Total_footprint_Motif_GR #####
 ### Total_footprint_Motif_GR are provided in google drive #####
 
 ```
