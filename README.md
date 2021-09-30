@@ -160,8 +160,7 @@ library('readr')
 library('GenomicRanges')
 source('Step4_functions.R')
 
-### First read the fragment from the cellranger-atac ####
-### 
+### First read the fragment from the cellranger-atac #### 
 
 ### Get the single cell names for each cell type ###
 ### Cell_names_list ####
@@ -173,7 +172,6 @@ Cell_names_list = split(E14_E16_ATAC_seurat$cell_id,E14_E16_ATAC_seurat$New_cell
 #[1] "AC/HC"  "Cone"   "E_N"    "RGC"    "RPC_S2"
 
 ### Load the total fragments for each time point ###
-
 
 Fragment_list = list()
 tags = c('E14','E16')
@@ -249,7 +247,20 @@ save(E14_E16_fragments_by_Celltype,file='E14_E16_fragments_by_Celltype')
 
 ### STEP 4.2：Cell-type specific fragments to pair-end bam files:
 ``` r
+load('E14_E16_fragments_by_Celltype')
 
+#### AC/HC to ACHC #####
+names(E14_E16_fragments_by_Celltype)[1] = 'ACHC'
+
+#### covert fragments to bedpe files and save it in the target folder: 
+Output_to_bed_files(E14_E16_fragments_by_Celltype,'/zp1/data/plyu3/Early')
+
+#### this step will generate 5 bedpe files:
+## 
+##
+##
+##
+## 
 
 ```
 
