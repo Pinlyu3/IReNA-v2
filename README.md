@@ -7,11 +7,11 @@
  </div>
 
 ## STEP 0: Before following the IReNA-v2 analysis pipeline
-The pipeline can be run in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects and ArchR objects can be downloaded by google drive: [Example datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
+The pipeline can be run in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects, ArchR objects and GRNs can be downloaded in the following link: [Datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
 
 
 ## STEP 1: Selecting candidate genes
-The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone:Cone, 
+The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone, 
 AC/HC.
 
 ``` r
@@ -81,6 +81,7 @@ E14_E16_new_proj_early <- addPeak2GeneLinks(
 
 
 ### Get peak-gene links ##########
+
 source('Get_p2g_fun')
 
 E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
@@ -96,11 +97,12 @@ head(E14_E16_new_proj_early_p2g)
 ```
 
 ## STEP 3: Identifying the potential cis-regulatory elements for each candidate gene
-We identified potential cis-regulatory elements for each candidate gene based on their location and the peak-to-gene links from Step2. We first classified all peaks into three categories according to their genomic location related to their potential target genes: 1) Promoter. 2) Gene body. 3) Intergenic. For the peaks in the promoter region,we treated all of them as correlated accessible chromatin regions (CARs) of their overlapping target genes. For the peaks in the gene body region, we defined them as CARs of their overlapping genes if they met the following criteria: 1) the distance between the peak and the TSS of its overlapping gene is < 100kb. 2) the links between the peak and its overlapping gene is significant.  For the peaks in the intergenic region, we first find their target genes and construct the peak-gene pairs if the target genes’ TSS are located within the upstream 100kb or downstream 100 kb of the intergenic peaks. Then we keep the peak-gene pairs if their peak-to-gene links are significant in step2. These peaks were identified as CARs of their gene pairs.
+We identified potential cis-regulatory elements for each candidate gene based on their location and the peak-to-gene links from Step2. We first classified all peaks into three categories according to their genomic location related to their potential target genes: 1) Promoter. 2) Gene body. 3) Intergenic. For the peaks in the promoter region,we treated all of them as correlated accessible chromatin regions (CARs) of their overlapping target genes. For the peaks in the gene body region, we defined them as CARs of their overlapping genes if they met the following criteria: 1) the distance between the peak and the TSS of its overlapping gene is < 100kb. 2) the links between the peak and its overlapping gene is significant. For the peaks in the intergenic region, we first find their target genes and construct the peak-gene pairs if the target genes’ TSS are located within the upstream 100kb or downstream 100 kb of the intergenic peaks. Then we keep the peak-gene pairs if their peak-to-gene links are significant in step2. These peaks were identified as CARs of their gene pairs.
 
 ``` r
+
 ### First load all the peaks #####
-### all the peaks identified in E11-P14 has beed classfied in into three categories： ####
+### all the peaks identified in E11-P14 has been classfied in into three categories： ####
 
 load('All_peaks_list_202009')
 
@@ -121,33 +123,25 @@ head(All_peaks_list$TSS)
 #  [6]     chr1 4807201-4809281      * |     Gm37988
 
 
+### loading the mm10 TSS data ####
+
+load('mm10_TSS_GR_all_202009')
+
+head(mm10_TSS_GR_all)
+
+#GRanges object with 47729 ranges and 2 metadata columns:
+#               seqnames    ranges strand |            gene_id      gene_name
+#                  <Rle> <IRanges>  <Rle> |        <character>    <character>
+#      [1]          chr1   3073253      * | ENSMUSG00000102693  4933401J01Rik
+#      [2]          chr1   3102016      * | ENSMUSG00000064842        Gm26206
+#      [3]          chr1   3671498      * | ENSMUSG00000051951           Xkr4
+#      [4]          chr1   3252757      * | ENSMUSG00000102851        Gm18956
 
 ```
 
 
 
 
-E14_E16_new_proj = ArchRProject(
-  ArrowFiles = files,
-  outputDirectory = "E14_E16_combine_202010",
-  copyArrows = FALSE
-)
-
-getAvailableMatrices(E14_E16_new_proj)
-
-E14_E16_new_proj_early = ArchR_Filter_proj(E14_E16_new_proj,cellnames)
-
-load('Peak_set_GR_202009')
-
-E14_E16_new_proj_early = addPeakSet_Matrix(E14_E16_new_proj_early,Peak_set_GR)
-
-E14_E16_new_proj_early = Process_project(E14_E16_new_proj_early)
-
-E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
-
-E14_E16_new_proj_early_Pmat = ArchR_Get_the_peak_matrix(E14_E16_new_proj_early,binarize=T)
-
-```
 
 ## STEP 4: Predicting cell-type specific TFs binding in cis-regulatory elements
 With the cis-regulatory elements identified in Step 3, we next predicted the TF binding in these elements for each cell type with the PWMs extracted from TRANSFAC database. Firstly, we searching the motifs in all the cis-regulatory elements with the function ‘matchMotifs (p.cutoff = 5e-05)’ from the motifmatchr package. Then we filtered these motif regions according to their footprint score and their corresponding TF’s expression for each cell type.
