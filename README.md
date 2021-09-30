@@ -411,7 +411,7 @@ Early_RGC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Ea
 Early_Cone_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_Cone_signal,Cone_TF,out_all_ext)
 Early_ACHC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_ACHC_signal,ACHC_TF,out_all_ext)
 
-### Futher filtered TFs bidnding region if their binding score don't meet: NC < -0.1 and NL > 0.1 and NR > 0.1. #####
+### Futher filtered TFs' binding region if their binding score don't meet: NC < -0.1 and NL > 0.1 and NR > 0.1. #####
 
 Early_RPCS2_footprints_cl = Filter_footprints(Early_RPCS2_footprints,delta=0.1)
 Early_EN_footprints_cl = Filter_footprints(Early_EN_footprints,delta=0.1)
