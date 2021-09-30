@@ -17,13 +17,21 @@ library(ArchR)
 
 
 ## STEP 1:Selecting candidate genes
-The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In constructing the GRNs of progenitors transition, the following parameters of ‘FindMarkers’ were used: min.pct = 0.05, logfc.threshold = 0.20, only.pos = TRUE, p-adjust < 0.01. In constructing GRNs regulating neurogenesis, the following parameters of ‘FindMarkers’ were used: min.pct = 0.1, logfc.threshold = 0.25, only.pos = TRUE and p-adjust < 0.01.
+The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone:Cone, 
+AC/HC
 
-### S0-1 load required packages
+### S1-1 
 ``` r
-library(Seurat)
-library(ArchR)
+load('E14_E16_RNA_seurat')
+
+Idents(E14_E16_RNA_seurat) <- 'New_celltypes'
+table(Idents(E14_E16_RNA_seurat))
+
+# E_N    RGC RPC_S2   Cone  AC/HC 
+# 3039   5944  16714   1436   1349 
+
 ```
+
 
 
 ## STEP 2:Identifying significant peak-to-gene links
