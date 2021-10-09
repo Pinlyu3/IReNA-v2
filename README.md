@@ -32,7 +32,6 @@ options(future.globals.maxSize = 10000 * 1024^2)
 
 #### With ‘FindMarkers’ in Seurat #####
 Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.25)
-
 Early_Diff_Genes = Markers[which(Markers$avg_logFC > 0 & Markers$p_val_adj < 0.01),]
 
 save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
