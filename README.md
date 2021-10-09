@@ -49,6 +49,18 @@ save(Early_Diff_Genes_tab,file='Early_Diff_Genes_tab_202103')
 ## STEP2: Identifying significant peak-to-gene links（scRNA-seq & scATAC-seq）
 We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression.
 
+### STEP2.1: Integrate scRNA-seq and scATAC-seq data for each time point
+``` r
+#### loading ArchR packages ####
+library(ArchR)
+library(GenomicRanges)
+addArchRThreads(threads = 10)
+addArchRGenome("mm10")
+
+#### load
+
+
+
 ``` r
 library(ArchR)
 library(GenomicRanges)
@@ -491,9 +503,6 @@ load('Early_Diff_Genes_tab_202103')
 #### loading the PtoG links from STEP2 #####
 load('E14_E16_new_proj_early_p2g')
 
-#### loading the gene-gene correlation from STEP5 ####
-load('Early_Corr_202107')
-
 #### loading the footprint information from STEP4 ####
 #### for each cell type ####
 load('Early_RPCS2_footprints_cl')
@@ -501,6 +510,9 @@ load('Early_EN_footprints_cl')
 load('Early_ACHC_footprints_cl')
 load('Early_Cone_footprints_cl')
 load('Early_RGC_footprints_cl')
+
+#### loading the gene-gene correlation from STEP5 ####
+load('Early_Corr_202107')
 
 #### loading the motif-TF table ####
 load('out_all_ext')
@@ -535,7 +547,6 @@ Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
 
 All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone_sp_Genes)
 All_genes_test = All_genes_test[!duplicated(All_genes_test)]
-
 #### 
 
 
