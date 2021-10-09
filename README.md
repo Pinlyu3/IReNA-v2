@@ -147,14 +147,16 @@ E16_new_proj_cl <- addGeneIntegrationMatrix(
 
 
 
-### STEP2.2: Integrate scRNA-seq and scATAC-seq data for each time point
+### STEP2.2: Calculate peak-to-gene correlations with E14-E16 samples
 ``` r
+#### loading the packages ####
 library(ArchR)
 library(GenomicRanges)
 addArchRThreads(threads = 10)
 addArchRGenome("mm10")
-setwd('/zp1/data/plyu3/Arrow_Project')
+source('Step2_functions')
 
+#### loading E14 and E16 arrows ####
 files = c(
 	'/E14.arrow',
 	'/E16.arrow'
@@ -170,11 +172,16 @@ E14_E16_new_proj = ArchRProject(
 
 getAvailableMatrices(E14_E16_new_proj)
 
-
+#### filtered the cells are not in E14_E16_ATAC_seurat ####
+cellnames = rownames(E14_E16_ATAC_seurat)
+cellnames = gsub(':','#',cellnames)
 E14_E16_new_proj_early = ArchR_Filter_proj(E14_E16_new_proj,cellnames)
 
-###
+#### add the peak-matrix and perform dimension reduction ####
+E14_E16_new_proj_early = addPeakSet_Matrix(E14_E16_new_proj_early,Peak_set_GR)
+E14_E16_new_proj_early <- Process_project(E14_E16_new_proj_early)
 
+#### integrate E14-E16 by harmony ####
 E14_E16_new_proj_early <- addHarmony(
     ArchRProj = E14_E16_new_proj_early,
     reducedDims = "IterativeLSI",
@@ -182,6 +189,7 @@ E14_E16_new_proj_early <- addHarmony(
     groupBy = "Sample"
 )
 
+#### calculate PtoG links ####
 E14_E16_new_proj_early <- addPeak2GeneLinks(
     ArchRProj = E14_E16_new_proj_early,
     reducedDims = "Harmony",
@@ -191,21 +199,14 @@ E14_E16_new_proj_early <- addPeak2GeneLinks(
     #### ######
 )
 
-
-### Get peak-gene links ##########
-
-source('Get_p2g_fun')
-
+#### Get PtoG links ####
 E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
+save(E14_E16_new_proj_early_p2g,file='E14_E16_new_proj_early_p2g')
 
 head(E14_E16_new_proj_early_p2g)
 
 
 ###
-
-
-###
-
 ```
 
 ## STEP3: Identifying the potential cis-regulatory elements for each candidate gene
