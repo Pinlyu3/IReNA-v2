@@ -220,6 +220,7 @@ We identified potential cis-regulatory elements for each candidate gene based on
 
 ``` r
 
+
 ### First load all the peaks #####
 ### all the peaks identified in E11-P14 has been classfied in into three categories： ####
 
@@ -255,10 +256,6 @@ head(mm10_TSS_GR_all)
 #      [4]          chr1   3252757      * | ENSMUSG00000102851        Gm18956
 
 ```
-
-
-
-
 
 ## STEP4: Predicting cell-type specific TFs binding in cis-regulatory elements
 With the cis-regulatory elements identified in Step 3, we next predicted the TF binding in these elements for each cell type with the PWMs extracted from TRANSFAC database. Firstly, we searching the motifs in all the cis-regulatory elements with the function ‘matchMotifs (p.cutoff = 5e-05)’ from the motifmatchr package. Then we filtered these motif regions according to their footprint score and their corresponding TF’s expression for each cell type.
