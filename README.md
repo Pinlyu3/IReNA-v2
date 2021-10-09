@@ -524,10 +524,21 @@ Cone_Reg_motif = Reg_one_cells_RPC_MG(Early_Cone_footprints_cl,early_peak_gene_l
 ```
 
 ## STEP5: Calculating gene-gene correlation
-We calculated the expression correlations between all the expressed genes at the single-cell level. First, we extracted the cell-by-matrix from Seurat objects and filtered out the non-expressed genes in the matrix (rowSums < 10). Then we applied the MAGIC software to impute missing values and recover the gene interactions with the cell-by-gene matrix. The output matrix from MAGIC was used to calculate gene-gene correlation using the function ‘cor’ in R.  To identify the significant gene-gene correlations, we ranked all the gene-gene correlations (~1X10e8). The top 2.5% correlations were treated as significant positive correlations (p < 0.025) and the bottom 2.5% correlations were treated as significant negative correlations  (p < 0.025).
+We calculated the expression correlations between all the expressed genes at the single-cell level. First, we extracted the cell-by-matrix from Seurat objects and filtered out the non-expressed genes in the matrix (rowSums < 10). Then we applied the MAGIC software to impute missing values and recover the gene interactions with the cell-by-gene matrix. The output matrix from MAGIC was used to calculate gene-gene correlation using the function ‘cor’ in R.  To identify the significant gene-gene correlations, we ranked all the gene-gene correlations (~1X10e8). The top 2.5% correlations were treated as significant positive correlations (p < 0.025) and the bottom 2.5% correlations were treated as significant negative correlations (p < 0.025).
 
 ``` r
+#### loading the packages ####
 library('Seurat')
+source('')
+
+#### loading the seurat objects ####
+load('E14_E16_RNA_seurat')
+
+#### before runnng MAGIC, we random sampled cells for each cell types to remove the potential bias #####
+#### the number of sampled cells is determined by the minimum number of cells among these cell types #####  
+
+load('')
+
 Reduction_Tag = 'umap'
 Input_matrix_Tag='RNA'
 dimsToUse = 1:30
@@ -596,8 +607,10 @@ Finally, we removed all the duplicated TF-target regulatory relationships for ea
 
 ``` r
 #### loading required packages ####
-
-
+library('GenomicRanges')
+library("TFBSTools")
+library("motifmatchr")
+library("Seurat")
 
 #### loading the footprint information from STEP4 ####
 #### for each cell type ####
