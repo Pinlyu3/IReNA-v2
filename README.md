@@ -23,12 +23,8 @@ AC/HC.
 load('E14_E16_RNA_seurat')
 
 #### Calculate the enriched genes for each cell type #####
-
 Idents(E14_E16_RNA_seurat) <- 'New_celltypes'
 table(Idents(E14_E16_RNA_seurat))
-
-#> E_N    RGC RPC_S2   Cone  AC/HC
-#> 3039   5944  16714   1436   1349
 
 library(future)
 plan("multiprocess", workers = 30)
