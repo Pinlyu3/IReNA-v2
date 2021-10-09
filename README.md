@@ -20,7 +20,8 @@ AC/HC.
 
 ``` r
 #### load requried packages #####
-
+library(Seurat)
+source('Step1_functions.R')
 
 #### load the E14-E16 scRNAseq datasets ####
 load('E14_E16_RNA_seurat')
@@ -594,6 +595,10 @@ We first obtained the peak-target links from Step 3, and cell-type specific TF-p
 Finally, we removed all the duplicated TF-target regulatory relationships for each cell type and merged them to the final GRNs which were used for the downstream analysis.
 
 ``` r
+#### loading required packages ####
+
+
+
 #### loading the footprint information from STEP4 ####
 #### for each cell type ####
 load('Early_RPCS2_footprints_cl')
@@ -624,17 +629,24 @@ head(mm10_TSS_GR_all)
 #                  <Rle> <IRanges>  <Rle> |        <character>    <character>
 #      [1]          chr1   3073253      * | ENSMUSG00000102693  4933401J01Rik
 #      [2]          chr1   3102016      * | ENSMUSG00000064842        Gm26206
-
-#### 
-
+ 
 #### loading the PtoG links from STEP2 #####
 load('E14_E16_new_proj_early_p2g')
 
-
-
-#### loading the PtoG links from STEP1 #####
+#### loading the enriched genes from STEP1 #####
 load('Early_Diff_Genes_tab_202103')
 
+#### selecting the enriched genes in all the cell types ####
+RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
+E_N_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$E_N >0)]
+AC_HC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' >0)]
+RGC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RGC >0)]
+Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
+
+All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone_sp_Genes)
+All_genes_test = All_genes_test[!duplicated(All_genes_test)]
+
+#### 
 
 
 
