@@ -22,7 +22,7 @@ AC/HC.
 #### load the E14-E16 scRNAseq datasets ####
 load('E14_E16_RNA_seurat')
 
-#### Calculate the enriched genes for each cell type #####
+#### calculate the enriched genes for each cell type #####
 Idents(E14_E16_RNA_seurat) <- 'New_celltypes'
 table(Idents(E14_E16_RNA_seurat))
 
@@ -30,7 +30,7 @@ library(future)
 plan("multiprocess", workers = 30)
 options(future.globals.maxSize = 10000 * 1024^2)
 
-#### With ‘FindMarkers’ in Seurat #####
+#### with ‘FindMarkers’ in Seurat #####
 Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.25)
 Early_Diff_Genes = Markers[which(Markers$avg_logFC > 0 & Markers$p_val_adj < 0.01),]
 
