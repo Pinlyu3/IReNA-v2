@@ -1,6 +1,6 @@
+#### change DEGs format ####
 
-
-Process_DEGs_to_Celltypes <- function(x,index=c('RPC_S3','L_N','AC/HC','Rod')){
+Process_DEGs_to_Celltypes <- function(x,index){
 	####
 	All_Genes = x$gene[!duplicated(x$gene)]
 	print(length(All_Genes))

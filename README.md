@@ -529,73 +529,28 @@ We calculated the expression correlations between all the expressed genes at the
 ``` r
 #### loading the packages ####
 library('Seurat')
-source('')
+source('Step5_functions.R')
 
 #### loading the seurat objects ####
 load('E14_E16_RNA_seurat')
 
 #### before runnng MAGIC, we random sampled cells for each cell types to remove the potential bias #####
 #### the number of sampled cells is determined by the minimum number of cells among these cell types #####  
+E14_E16_RNA_seurat_choose = random_cells_by_celltypes(E14_E16_RNA_seurat,c('AC/HC','E_N','RGC','RPC_S2','Cone'))
 
-load('')
+#### running MAGIC ####
+#### please flowing the instructions in https://github.com/KrishnaswamyLab/MAGIC to run magic ####
+library(Rmagic)
+magic_input_data = as.matrix(Matrix::t(E14_E16_RNA_seurat_choose[['RNA']]@data))
+Early_MAGIC <- magic(magic_testdata, genes=rownames(E14_E16_RNA_seurat_choose),t=1)
+saveRDS(Early_MAGIC,file='Early_MAGIC_td1_UMAP_202107_MAGIC_matrix')
 
-Reduction_Tag = 'umap'
-Input_matrix_Tag='RNA'
-dimsToUse = 1:30
-k=30
+#### reading the matrix generated from MAGIC ####
+Early_MAGIC = readRDS('Early_MAGIC_td1_UMAP_202107_MAGIC_matrix.rds')
 
-GRNmo_Smoothing_MAGIC(E14_E16_RNA_seurat_choose,'harmony','RNA','Early_MAGIC_td1_UMAP_202107',1:30,k=30,td=1,"/zp1/data/plyu3/Arrow_Project/New_Figure5_202009")
-
-
-Early_MAGIC = readRDS('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009/Early_MAGIC_td1_UMAP_202107_MAGIC_matrix.rds')
-
-
-sparse.cor3 <- function(x){
-    n <- nrow(x)
-    cMeans <- colMeans(x)
-    cSums <- colSums(x)
-    # Calculate the population covariance matrix.
-    # There's no need to divide by (n-1) as the std. dev is also calculated the same way.
-    # The code is optimized to minize use of memory and expensive operations
-    covmat <- tcrossprod(cMeans, (-2*cSums+n*cMeans))
-    crossp <- as.matrix(crossprod(x))
-    covmat <- covmat+crossp
-    sdvec <- sqrt(diag(covmat)) # standard deviations of columns
-    covmat/crossprod(t(sdvec)) # correlation matrix
-}
-
+#### calculating the correaltions and get the postive and negative gene pairs #####
 Early_Corr = RNA_Corr_RPCMG_Add_cutoff(Early_MAGIC)
-
-RPC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,RPC_Reg_motif,All_genes_test)
-EN_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,EN_Reg_motif,All_genes_test)
-ACHC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,ACHC_Reg_motif,All_genes_test)
-RGC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,RGC_Reg_motif,All_genes_test)
-Cone_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,Cone_Reg_motif,All_genes_test)
-
-
-RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
-E_N_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$E_N >0)]
-AC_HC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' >0)]
-RGC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RGC >0)]
-Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
-
-f1 = which(RPC_Reg_motif$TFs %in% RPC_S2_sp_Genes == T)
-f2 = which(EN_Reg_motif$TFs %in% E_N_sp_Genes == T)
-f3 = which(ACHC_Reg_motif$TFs %in% AC_HC_sp_Genes == T)
-f4 = which(RGC_Reg_motif$TFs %in% RGC_sp_Genes == T)
-f5 = which(Cone_Reg_motif$TFs %in% Cone_sp_Genes == T)
-
-RPC_Reg_motif_cl = RPC_Reg_motif[f1,]
-EN_Reg_motif_cl = EN_Reg_motif[f2,]
-ACHC_Reg_motif_cl = ACHC_Reg_motif[f3,]
-RGC_Reg_motif_cl = RGC_Reg_motif[f4,]
-Cone_Reg_motif_cl = Cone_Reg_motif[f5,]
-
-Motif_list = list(RPC_Reg_motif_cl,EN_Reg_motif_cl,ACHC_Reg_motif_cl,RGC_Reg_motif_cl,Cone_Reg_motif_cl)
-names(Motif_list) = c('RPCs','EN','ACHC','RGC','Cone')
-
-#####
-#####
+save(Early_Corr,file='Early_Corr')
 
 ```
 
