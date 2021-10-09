@@ -7,7 +7,9 @@
  </div>
 
 ## STEP0: Before following the IReNA-v2 analysis pipeline
-The pipeline can be run in R environment. We use E14-E16 scRNAseq/scATACseq datasets as example datasets. Seurat objects, ArchR objects and Intermediate files can be downloaded in the following link: [Datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
+The pipeline can be run in R environment. 
+We use E14-E16 scRNAseq/scATACseq datasets as example datasets. 
+Seurat objects, ArchR objects and intermediate files can be downloaded in the following link: [Datasets](https://drive.google.com/drive/folders/1BMwEuVM72ThIJj5MwqUAmGuhcvN-WChF?usp=sharing)
 
 
 ## STEP1: Selecting candidate genes
