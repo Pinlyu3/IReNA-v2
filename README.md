@@ -434,7 +434,7 @@ save(Early_ACHC_footprints_cl,file='Early_ACHC_footprints_cl')
 ```
 
 ## STEP5: Calculating gene-gene correlation
-We calculated the expression correlations between all the expressed genes at the single-cell level. First, we extracted the cell-by-matrix from Seurat objects and filtered out the non-expressed genes in the matrix (rowSums < 10). Then we applied the MAGIC software to impute missing values and recover the gene interactions with the cell-by-gene matrix. The output matrix from MAGIC was used to calculate gene-gene correlation using the function ‘cor’ in R.  To identify the significant gene-gene correlations, we ranked all the gene-gene correlations (~1X10e8). The top 2.5% correlations were treated as significant positive correlations (p < 0.025) and the bottom 2.5% correlations were treated as significant negative correlations (p < 0.025).
+We calculated the expression correlations between all the expressed genes at the single-cell level. First, we extracted the cell-by-matrix from Seurat objects and filtered out the non-expressed genes in the matrix. Then we applied the MAGIC software to impute missing values and recover the gene interactions with the cell-by-gene matrix. The output matrix from MAGIC was used to calculate gene-gene correlation using the function ‘cor’ in R.  To identify the significant gene-gene correlations, we ranked all the gene-gene correlations (~1X10e8). The top 2.5% correlations were treated as significant positive correlations (p < 0.025) and the bottom 2.5% correlations were treated as significant negative correlations (p < 0.025).
 
 ``` r
 #### loading the packages ####
@@ -490,8 +490,6 @@ load('Early_Diff_Genes_tab_202103')
 
 #### loading the PtoG links from STEP2 #####
 load('E14_E16_new_proj_early_p2g')
-
-
 
 #### loading the gene-gene correlation from STEP5 ####
 load('Early_Corr_202107')
