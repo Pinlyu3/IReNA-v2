@@ -11,7 +11,7 @@ The pipeline can be run in R environment. We use E14-E16 scRNAseq/scATACseq data
 
 
 ## STEP1: Selecting candidate genes
-The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone, 
+The DEGs were used as candidate genes for GRNs construction. For each developmental process which we aim to investigate in mouse and human, we identified the enriched genes for each cell type using the function ‘FindMarkers’ in Seurat. In E14-E16 samples, we have 5 cell types: E_N: Early NG, RGC, RPC_S2: RPC S2, Cone,
 AC/HC.
 
 ``` r
@@ -20,10 +20,10 @@ load('E14_E16_RNA_seurat')
 Idents(E14_E16_RNA_seurat) <- 'New_celltypes'
 table(Idents(E14_E16_RNA_seurat))
 
-#> E_N    RGC RPC_S2   Cone  AC/HC 
-#> 3039   5944  16714   1436   1349 
+#> E_N    RGC RPC_S2   Cone  AC/HC
+#> 3039   5944  16714   1436   1349
 
-#> call markers 
+#> call markers
 library(future)
 plan("multiprocess", workers = 30)
 options(future.globals.maxSize = 10000 * 1024^2)
@@ -43,7 +43,7 @@ We used the ArchR package to identify the significant peak-to-gene links. First,
 ``` r
 library(ArchR)
 library(GenomicRanges)
-addArchRThreads(threads = 10) 
+addArchRThreads(threads = 10)
 addArchRGenome("mm10")
 setwd('/zp1/data/plyu3/Arrow_Project')
 
@@ -58,7 +58,7 @@ files = c(
 names(files) = c('E14','E16')
 
 E14_E16_new_proj = ArchRProject(
-  ArrowFiles = files, 
+  ArrowFiles = files,
   outputDirectory = "E14_E16_combine_202010tmp",
   copyArrows = FALSE
 )
@@ -68,7 +68,7 @@ getAvailableMatrices(E14_E16_new_proj)
 
 E14_E16_new_proj_early = ArchR_Filter_proj(E14_E16_new_proj,cellnames)
 
-### 
+###
 
 E14_E16_new_proj_early <- addHarmony(
     ArchRProj = E14_E16_new_proj_early,
@@ -160,7 +160,7 @@ library('readr')
 library('GenomicRanges')
 source('Step4_functions.R')
 
-### First read the fragment from the cellranger-atac #### 
+### First read the fragment from the cellranger-atac ####
 
 ### Get the single cell names for each cell type ###
 ### Cell_names_list ####
@@ -252,7 +252,7 @@ load('E14_E16_fragments_by_Celltype')
 #### AC/HC to ACHC #####
 names(E14_E16_fragments_by_Celltype)[1] = 'ACHC'
 
-#### covert fragments to bedpe files and save it in the target folder: 
+#### covert fragments to bedpe files and save it in the target folder:
 Output_to_bed_files(E14_E16_fragments_by_Celltype,'/zp1/data/plyu3/Early')
 
 #### this step will generate 5 bedpe files for each cell type:
