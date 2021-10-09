@@ -56,11 +56,98 @@ library(ArchR)
 library(GenomicRanges)
 addArchRThreads(threads = 10)
 addArchRGenome("mm10")
+source('Step2_functions')
 
-#### load
+#### load Seurat objects ####
+load('E14_E16_RNA_seurat')
+load('E14_E16_ATAC_seurat')
+
+inputFiles = c('E14.arrow','E16.arrow')
+names(inputFiles) = c('E14','E16')
+
+#### load all the 283,847 peaks ####
+load('/zp1/data/plyu3/Arrow_Project/Peak_set_GR_202009')
+
+#### for E14 ####
+#### read the arrow file ####
+E14_new_proj = ArchRProject(
+  ArrowFiles = inputFiles[1], 
+  outputDirectory = "E11_P8_combine_202010",
+  copyArrows = TRUE
+)
+
+#### filted out the cells not in E14_E16_ATAC_seurat ####
+index = which(E14_E16_ATAC_seurat$orig.ident == 'E14')
+cellnames = rownames(E14_E16_ATAC_seurat)[index]
+cellnames = gsub(':','#',cellnames)
+E14_new_proj_cl = Filter_proj(E14_new_proj,cellnames)
+
+#### add the peak-matrix ####
+E14_new_proj_cl = addPeakSet_Matrix(E14_new_proj_cl,Peak_set_GR)
+
+#### demension reduction using peak-matrix ####
+E14_new_proj_cl <- Process_project(E14_new_proj_cl)
+
+#### integrate with E14 single-cell RNAseq datasets ####
+RNA_merge = subset(E14_E16_RNA_seurat,subset=time %in% c('E14_rep1','E14_rep2') == T)
+
+#### addGeneIntegrationMatrix to E14.arrow ####
+E14_new_proj_cl <- addGeneIntegrationMatrix(
+    ArchRProj = E14_new_proj_cl, 
+    useMatrix = "GeneScoreMatrix",
+    matrixName = "GeneIntegrationMatrix",
+    reducedDims = "IterativeLSI",
+    seRNA = RNA_merge,
+    addToArrow = TRUE,
+    force=TRUE,
+    groupRNA = "celltypes",
+    nameCell = "predictedCell_Un",
+    nameGroup = "predictedGroup_Un",
+    nameScore = "predictedScore_Un"
+)
+
+#### for E16 ####
+#### read the arrow file ####
+E16_new_proj = ArchRProject(
+  ArrowFiles = inputFiles[2], 
+  outputDirectory = "E11_P8_combine_202010",
+  copyArrows = TRUE
+)
+
+#### filted out the cells not in E14_E16_ATAC_seurat ####
+index = which(E14_E16_ATAC_seurat$orig.ident == 'E16')
+cellnames = rownames(E14_E16_ATAC_seurat)[index]
+cellnames = gsub(':','#',cellnames)
+E16_new_proj_cl = Filter_proj(E16_new_proj,cellnames)
+
+#### add the peak-matrix ####
+E16_new_proj_cl = addPeakSet_Matrix(E16_new_proj_cl,Peak_set_GR)
+
+#### demension reduction using peak-matrix ####
+E16_new_proj_cl <- Process_project(E16_new_proj_cl)
+
+#### integrate with E14 single-cell RNAseq datasets ####
+RNA_merge = subset(E14_E16_RNA_seurat,subset=time %in% c('E16') == T)
+
+#### addGeneIntegrationMatrix to E16.arrow ####
+E16_new_proj_cl <- addGeneIntegrationMatrix(
+    ArchRProj = E16_new_proj_cl, 
+    useMatrix = "GeneScoreMatrix",
+    matrixName = "GeneIntegrationMatrix",
+    reducedDims = "IterativeLSI",
+    seRNA = RNA_merge,
+    addToArrow = TRUE,
+    force=TRUE,
+    groupRNA = "celltypes",
+    nameCell = "predictedCell_Un",
+    nameGroup = "predictedGroup_Un",
+    nameScore = "predictedScore_Un"
+)
+``` 
 
 
 
+### STEP2.2: Integrate scRNA-seq and scATAC-seq data for each time point
 ``` r
 library(ArchR)
 library(GenomicRanges)
