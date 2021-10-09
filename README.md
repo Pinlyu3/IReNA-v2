@@ -281,7 +281,6 @@ Cell_names_list = split(E14_E16_ATAC_seurat$cell_id,E14_E16_ATAC_seurat$New_cell
 #[1] "AC/HC"  "Cone"   "E_N"    "RGC"    "RPC_S2"
 
 ### Load the total fragments for each time point ###
-
 Fragment_list = list()
 tags = c('E14','E16')
 for(i in tags){
@@ -295,21 +294,16 @@ for(i in tags){
     Fragment_list = c(Fragment_list,tab_GR)
 }
 names(Fragment_list) = tags
-
 E14_E16_Fragment_list = Fragment_list
 
 setwd('/zp1/data/plyu3/scATACseq_new_clean/')
-
 save(E14_E16_Fragment_list,file='E14_E16_Fragment_list')
 
 ## E14_E16_Fragment_list provided in google drive ###
-
 load('E14_E16_Fragment_list')
-
 Fragments_filter = E14_E16_Fragment_list
 
 ### extract fragment for each cell type ###
-
 Total_insertion_list = list()
 
 for(i in 1:length(Cell_names_list)){
@@ -350,7 +344,6 @@ for(i in 1:length(Cell_names_list)){
 names(Total_insertion_list) = names(Cell_names_list)
 E14_E16_fragments_by_Celltype = Total_insertion_list
 save(E14_E16_fragments_by_Celltype,file='E14_E16_fragments_by_Celltype')
-
 ```
 
 
@@ -363,7 +356,6 @@ names(E14_E16_fragments_by_Celltype)[1] = 'ACHC'
 
 #### covert fragments to bedpe files and save it in the target folder:
 Output_to_bed_files(E14_E16_fragments_by_Celltype,'/zp1/data/plyu3/Early')
-
 #### this step will generate 5 bedpe files for each cell type:
 ## RPC_S2_fragments_cl_bamGR_pe.bed
 ## RGC_fragments_cl_bamGR_pe.bed
@@ -372,7 +364,6 @@ Output_to_bed_files(E14_E16_fragments_by_Celltype,'/zp1/data/plyu3/Early')
 ## Cone_fragments_cl_bamGR_pe.bed
 
 #### covert bedpe files to bamfiles with bedtools, sort and index the bams with samtools:
-
 for(i in names(E14_E16_fragments_by_Celltype)){
 	print(i)
 	shell= paste("bedtools bedpetobam -i ",i,"_fragments_cl_bamGR_pe.bed -g /zp1/data/plyu3/SoftWare/mm10_datasets/chrom_mm10.sizes > ",i,"_fragments_cl_bamGR_pe.bam" ,sep="")
@@ -392,13 +383,11 @@ for(i in names(E14_E16_fragments_by_Celltype)){
 }
 
 ### this step will finall generated 5 sorted and indexed bam files:
-
 ## ACHC_fragments_cl_bamGR_pe_s.bam
 ## Cone_fragments_cl_bamGR_pe_s.bam
 ## E_N_fragments_cl_bamGR_pe_s.bam
 ## RGC_fragments_cl_bamGR_pe_s.bam
 ## RPC_S2_fragments_cl_bamGR_pe_s.bam
-
 ```
 
 
@@ -424,15 +413,12 @@ nohup TOBIAS ATACorrect --read_shift 0 0 --bam RPC_S2_fragments_cl_bamGR_pe_s.ba
 ## RGC_fragments_cl_bamGR_pe_s_corrected.bw
 ## Cone_fragments_cl_bamGR_pe_s_corrected.bw
 ## ACHC_fragments_cl_bamGR_pe_s_corrected.bw
-
 ```
 
 ### STEP4.4：Calculate the footprint scores including NC, NL and NR for each motif's binding region
 
 ``` r
-
 ### first convert normalized bw files to GRanges and save/output ######
-
 file = 'RPC_S2_fragments_cl_bamGR_pe_s_corrected.bw'
 savefile = 'Early_RPCS2_signal'
 Check_normalized_Signal(file,savefile)
@@ -453,9 +439,7 @@ file = 'ACHC_fragments_cl_bamGR_pe_s_corrected.bw'
 savefile = 'Early_ACHC_signal'
 Check_normalized_Signal(file,savefile)
 
-
 ### Calculate the Motif binding region in all the peaks using motifmatchr #######
-
 library('GenomicRanges')
 library("TFBSTools")
 library("motifmatchr")
@@ -472,7 +456,6 @@ library('BSgenome.Mmusculus.UCSC.mm10.masked')
 
 ### find the motifs in the peaks ######
 ### convert the results of motifmatchr to a GRanges object ##############
-
 Total_footprint_Motif = matchMotifs(PWM_list_combine_cl,All_peaks_GR,genome = BSgenome.Mmusculus.UCSC.mm10.masked,out='positions',p.cutoff = 5e-05)
 
 Total_footprint_Motif_GR = Must_to_GR(Total_footprint_Motif)
@@ -482,7 +465,6 @@ Total_footprint_Motif_GR = Must_to_GR(Total_footprint_Motif)
 
 ### load the motifs names and their corresponding TFs name ####
 ### out_all_ext: col1: Motif col2: TFs ####
-
 load('out_all_ext')
 
 ### load the DEGs ####
@@ -491,7 +473,6 @@ load('Early_Diff_Genes_tab_202103')
 
 ### First filter out the footprints if their correaponding gene expression are not enriched in their cell type: ####
 ### for each cell type, we are only interest in the TFs which enriched in that cell type #####
-
 setwd('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009')
 load('Early_Diff_Genes_tab_202103')
 
@@ -512,7 +493,6 @@ ACHC_TF = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' > 0)]
 
 #### We removed the motifs binding for each cell type if the expression level of their corresponding TFs are not enriched in that cell type #####
 #### Then we calulated the NC, NL and NR for each motifs binding region with the cell-type specific signal #####
-
 Early_RPCS2_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_RPCS2_signal,RPCS2_TF,out_all_ext)
 Early_EN_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_EN_signal,EN_TF,out_all_ext)
 Early_RGC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_RGC_signal,RGC_TF,out_all_ext)
@@ -520,7 +500,6 @@ Early_Cone_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,E
 Early_ACHC_footprints = Calculate_footprint_celltypes(Total_footprint_Motif_GR,Early_ACHC_signal,ACHC_TF,out_all_ext)
 
 ### Futher filtered TFs' binding region if their binding score don't meet: NC < -0.1 and NL > 0.1 and NR > 0.1. #####
-
 Early_RPCS2_footprints_cl = Filter_footprints(Early_RPCS2_footprints,delta=0.1)
 Early_EN_footprints_cl = Filter_footprints(Early_EN_footprints,delta=0.1)
 Early_RGC_footprints_cl = Filter_footprints(Early_RGC_footprints,delta=0.1)
@@ -528,7 +507,6 @@ Early_Cone_footprints_cl = Filter_footprints(Early_Cone_footprints,delta=0.1)
 Early_ACHC_footprints_cl = Filter_footprints(Early_ACHC_footprints,delta=0.1)
 
 #### Final: save the results of Step4: #########
-
 save(Early_RPCS2_footprints_cl,file='Early_RPCS2_footprints_cl')
 save(Early_EN_footprints_cl,file='Early_EN_footprints_cl')
 save(Early_RGC_footprints_cl,file='Early_RGC_footprints_cl')
