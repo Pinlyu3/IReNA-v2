@@ -39,7 +39,7 @@ save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
 
 
 
-## STEP2:Identifying significant peak-to-gene links（scRNA-seq & scATAC-seq）
+## STEP2: Identifying significant peak-to-gene links（scRNA-seq & scATAC-seq）
 We used the ArchR package to identify the significant peak-to-gene links. First, we integrated the age-matched scRNA-seq and scATAC-seq datasets for each time point using unconstrained Integration method with the function ‘addGeneIntegrationMatrix’. Then, using the function ‘addPeak2GeneLinks’, we calculated the correlation between accessibility peak intensity and gene expression.
 
 ``` r
@@ -48,9 +48,6 @@ library(GenomicRanges)
 addArchRThreads(threads = 10)
 addArchRGenome("mm10")
 setwd('/zp1/data/plyu3/Arrow_Project')
-
-
-
 
 files = c(
 	'/E14.arrow',
@@ -585,29 +582,52 @@ names(Motif_list) = c('RPCs','EN','ACHC','RGC','Cone')
 ```
 
 
-## STEP6: Constructing gene regulatory networks
+## STEP6: Constructing cell type-specific gene regulatory networks
 By integrating data from Step1-Step5, We constructed cell-type specific GRNs with the following procedure:
-We first obtained the peak-target links from Step 3, and cell-type specific TF-peak links from Step 4.  We then merged these 2 types of links to the cell-type specific TF-peak-target relationships. Next, we classified these TF-peak-target relationships into activation or repression relationships based on the sign of the expression correlation between TF and target from Step 5. The significant positive/negative correlated TF-targets were selected as the active/repressive regulations respectively.
+We first obtained the peak-target links from Step 3, and cell-type specific TF-peak links from Step 4. We then merged these 2 types of links to the cell-type specific TF-peak-target relationships. Next, we classified these TF-peak-target relationships into activation or repression relationships based on the sign of the expression correlation between TF and target from Step 5. The significant positive/negative correlated TF-targets were selected as the active/repressive regulations respectively.
 Finally, we removed all the duplicated TF-target regulatory relationships for each cell type and merged them to the final GRNs which were used for the downstream analysis.
 
 ``` r
-Motif_list_cl = list()
+#### loading the footprint information from STEP4 ####
+#### for each cell type ####
+load('Early_RPCS2_footprints_cl')
+load('Early_EN_footprints_cl')
+load('Early_ACHC_footprints_cl')
+load('Early_Cone_footprints_cl')
+load('Early_RGC_footprints_cl')
 
-for(i in 1:length(Motif_list)){
-	print(i)
-	temp_list = Motif_list[[i]]
-	print(dim(temp_list))
-	index = which(duplicated(temp_list$index) == T)
-	temp_list_cl = temp_list[-index,]
-	print(dim(temp_list_cl))
-	Motif_list_cl = c(Motif_list_cl,list(temp_list_cl))
-}
+#### loading the motif-TF table ####
+load('out_all_ext')
+head(out_all_ext)
+#   Motif   TFs
+#1 M00001 Myod1
+#2 M00002  Tcf3
+#3 M00004   Myb
 
-#####
-#####
-names(Motif_list_cl) = names(Motif_list)
+#### loading identified peaks #####
+#### these peaks have been classified to 3 classes #### 
+load('All_peaks_list_202009')
+names(All_peaks_list)
+#[1] "TSS"        "GeneBody"   "Intergenic"
 
-Early_Motif_list_cl = Motif_list_cl
+#### loading the TSS region #######
+load('mm10_TSS_GR_all_202009')
+head(mm10_TSS_GR_all)
+#GRanges object with 47729 ranges and 2 metadata columns:
+#               seqnames    ranges strand |            gene_id      gene_name
+#                  <Rle> <IRanges>  <Rle> |        <character>    <character>
+#      [1]          chr1   3073253      * | ENSMUSG00000102693  4933401J01Rik
+#      [2]          chr1   3102016      * | ENSMUSG00000064842        Gm26206
+
+#### 
+
+#### loading the 
+
+
+
+
+
+
 ```
 
 ## STEP 7: Identifying and visualizing feedback TF pairs
