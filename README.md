@@ -19,6 +19,9 @@ The DEGs were used as candidate genes for GRNs construction. For each developmen
 AC/HC.
 
 ``` r
+#### load requried packages #####
+
+
 #### load the E14-E16 scRNAseq datasets ####
 load('E14_E16_RNA_seurat')
 
@@ -34,7 +37,10 @@ options(future.globals.maxSize = 10000 * 1024^2)
 Markers = FindAllMarkers(E14_E16_RNA_seurat,min.pct=0.1,logfc.threshold=0.25)
 Early_Diff_Genes = Markers[which(Markers$avg_logFC > 0 & Markers$p_val_adj < 0.01),]
 
-save(Early_Diff_Genes,file='Early_Diff_Genes_202103')
+#### change format and save ####
+Early_Diff_Genes_tab = Process_DEGs_to_Celltypes(Early_Diff_Genes,index=c('RPC_S2','E_N','AC/HC','RGC','Cone'))
+save(Early_Diff_Genes_tab,file='Early_Diff_Genes_tab_202103')
+
 ```
 
 
@@ -621,7 +627,14 @@ head(mm10_TSS_GR_all)
 
 #### 
 
-#### loading the 
+#### loading the PtoG links from STEP2 #####
+load('E14_E16_new_proj_early_p2g')
+
+
+
+#### loading the PtoG links from STEP1 #####
+load('Early_Diff_Genes_tab_202103')
+
 
 
 
