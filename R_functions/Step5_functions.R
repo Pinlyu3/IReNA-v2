@@ -34,7 +34,7 @@ random_cells_by_celltypes = function(x,celltypes){
 
 #### calculate the corelation between genes ####
 
-RNA_Corr_RPCMG_Add_cutoff <- function(smooth_matrix){
+RNA_Corr_Add_cutoff <- function(smooth_matrix){
 	smooth_matrix_ori = smooth_matrix
 	####
 	k_index = which(smooth_matrix@x > 0)

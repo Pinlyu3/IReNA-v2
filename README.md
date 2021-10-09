@@ -433,8 +433,6 @@ save(Early_RGC_footprints_cl,file='Early_RGC_footprints_cl')
 save(Early_Cone_footprints_cl,file='Early_Cone_footprints_cl')
 save(Early_ACHC_footprints_cl,file='Early_ACHC_footprints_cl')
 
-#### *_footprints_cl are provided in google drive #####
-
 ```
 
 
@@ -506,21 +504,6 @@ Output_CARs = function(peak_gene_list){
 }
 
 DEGs_CAR_table = Output_CARs(peak_gene_list)
-
-load('Early_RPCS2_footprints_cl')
-load('Early_EN_footprints_cl')
-load('Early_ACHC_footprints_cl')
-load('Early_Cone_footprints_cl')
-load('Early_RGC_footprints_cl')
-
-RPC_Reg_motif = Reg_one_cells_RPC_MG(Early_RPCS2_footprints_cl,early_peak_gene_list,out_all_ext,All_genes_test)
-EN_Reg_motif = Reg_one_cells_RPC_MG(Early_EN_footprints_cl,early_peak_gene_list,out_all_ext,All_genes_test)
-ACHC_Reg_motif = Reg_one_cells_RPC_MG(Early_ACHC_footprints_cl,early_peak_gene_list,out_all_ext,All_genes_test)
-RGC_Reg_motif = Reg_one_cells_RPC_MG(Early_RGC_footprints_cl,early_peak_gene_list,out_all_ext,All_genes_test)
-Cone_Reg_motif = Reg_one_cells_RPC_MG(Early_Cone_footprints_cl,early_peak_gene_list,out_all_ext,All_genes_test)
-
-
-
 ```
 
 ## STEP5: Calculating gene-gene correlation
@@ -542,16 +525,24 @@ E14_E16_RNA_seurat_choose = random_cells_by_celltypes(E14_E16_RNA_seurat,c('AC/H
 #### please flowing the instructions in https://github.com/KrishnaswamyLab/MAGIC to run magic ####
 library(Rmagic)
 magic_input_data = as.matrix(Matrix::t(E14_E16_RNA_seurat_choose[['RNA']]@data))
-Early_MAGIC <- magic(magic_testdata, genes=rownames(E14_E16_RNA_seurat_choose),t=1)
-saveRDS(Early_MAGIC,file='Early_MAGIC_td1_UMAP_202107_MAGIC_matrix')
+Early_MAGIC <- t(magic(magic_input_data, genes=colnames(magic_input_data),t=1)$result)
+saveRDS(Early_MAGIC,file='Early_MAGIC_td1_UMAP_202107_MAGIC_matrix.rds')
 
 #### reading the matrix generated from MAGIC ####
 Early_MAGIC = readRDS('Early_MAGIC_td1_UMAP_202107_MAGIC_matrix.rds')
 
 #### calculating the correaltions and get the postive and negative gene pairs #####
-Early_Corr = RNA_Corr_RPCMG_Add_cutoff(Early_MAGIC)
-save(Early_Corr,file='Early_Corr')
+Early_Corr = RNA_Corr_Add_cutoff(Early_MAGIC)
+save(Early_Corr,file='Early_Corr_202107')
+head(Early_Corr)
+#        Var1    Var2       value tag
+#15707   Xkr4  Mrpl15 -0.03422459  No
+#31413   Xkr4  Lypla1 -0.09380796  No
+#31414 Mrpl15  Lypla1  0.08051847  No
 
+table(Early_Corr$tag)
+#	neg        No       pos 
+#  1717083 119773020   1841262 
 ```
 
 
@@ -603,6 +594,9 @@ load('E14_E16_new_proj_early_p2g')
 
 #### loading the enriched genes from STEP1 #####
 load('Early_Diff_Genes_tab_202103')
+
+#### loading the gene-gene correlation from STEP5 ####
+load('Early_Corr_202107')
 
 #### selecting the enriched genes in all the cell types ####
 RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
