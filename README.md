@@ -145,8 +145,6 @@ E16_new_proj_cl <- addGeneIntegrationMatrix(
 )
 ``` 
 
-
-
 ### STEP2.2: Calculate peak-to-gene correlations with E14-E16 samples
 ``` r
 #### loading the packages ####
@@ -204,9 +202,17 @@ E14_E16_new_proj_early_p2g = Get_p2g_fun(E14_E16_new_proj_early)
 save(E14_E16_new_proj_early_p2g,file='E14_E16_new_proj_early_p2g')
 
 head(E14_E16_new_proj_early_p2g)
-
-
-###
+#DataFrame with 6 rows and 8 columns
+#    idxATAC    idxRNA       Correlation                   FDR          VarQATAC
+#  <integer> <integer>         <numeric>             <numeric>         <numeric>
+#1       111         4 0.375515140178004  5.36448281955197e-50 0.895630392429724
+#2       117         5 0.337298839247753  5.72493704229776e-40 0.937822136573577
+#3       119         5 0.775314060682344 3.77683726036747e-297 0.955683871945097
+#            VarQRNA                 peak    gene
+#          <numeric>          <character> <array>
+#1 0.863483609156046 chr1:4766394-4767174  Mrpl15
+#2 0.912307399657599 chr1:4784887-4786500  Lypla1
+#3 0.912307399657599 chr1:4802424-4803018  Lypla1
 ```
 
 ## STEP3: Identifying the potential cis-regulatory elements for each candidate gene
