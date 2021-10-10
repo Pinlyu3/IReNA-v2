@@ -260,12 +260,11 @@ Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
 All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone_sp_Genes)
 All_genes_test = All_genes_test[!duplicated(All_genes_test)]
 
-### 
+### get potential cis-regulatory elements for each candidate gene #####
 Early_peak_gene_list = Selection_peaks_for_one(All_peaks_list,All_genes_test,E14_E16_new_proj_early_p2g,distance_F=100000,mm10_TSS_GR_all)
 
 ### save the results ####
 save(Early_peak_gene_list,file='Early_peak_gene_list')
-
 ```
 
 ## STEP4: Predicting cell-type specific TFs binding in cis-regulatory elements
