@@ -219,29 +219,23 @@ head(E14_E16_new_proj_early_p2g)
 We identified potential cis-regulatory elements for each candidate gene based on their location and the peak-to-gene links from Step2. We first classified all peaks into three categories according to their genomic location related to their potential target genes: 1) Promoter. 2) Gene body. 3) Intergenic. For the peaks in the promoter region,we treated all of them as correlated accessible chromatin regions (CARs) of their overlapping target genes. For the peaks in the gene body region, we defined them as CARs of their overlapping genes if they met the following criteria: 1) the distance between the peak and the TSS of its overlapping gene is < 100kb. 2) the links between the peak and its overlapping gene is significant. For the peaks in the intergenic region, we first find their target genes and construct the peak-gene pairs if the target genes’ TSS are located within the upstream 100kb or downstream 100 kb of the intergenic peaks. Then we keep the peak-gene pairs if their peak-to-gene links are significant in step2. These peaks were identified as CARs of their gene pairs.
 
 ``` r
-
+#### load requried packages #####
+library(Seurat)
+source('Step3_functions.R')
 
 ### First load all the peaks #####
 ### all the peaks identified in E11-P14 has been classfied in into three categories： ####
-
 load('All_peaks_list_202009')
-
 names(All_peaks_list)
-
 # [1] "TSS"        "GeneBody"   "Intergenic"
 
 head(All_peaks_list$TSS)
-
 #GRanges object with 6 ranges and 1 metadata column:
 #      seqnames          ranges strand |   gene_name
 #         <Rle>       <IRanges>  <Rle> | <character>
 #  [1]     chr1 3669496-3669995      * |        Xkr4
 #  [2]     chr1 3670374-3672828      * |        Xkr4
 #  [3]     chr1 4496360-4497811      * |       Sox17
-#  [4]     chr1 4784887-4786500      * |      Mrpl15
-#  [5]     chr1 4807201-4809281      * |      Lypla1
-#  [6]     chr1 4807201-4809281      * |     Gm37988
-
 
 ### loading the mm10 TSS information ####
 load('mm10_TSS_GR_all_202009')
@@ -252,8 +246,25 @@ head(mm10_TSS_GR_all)
 #                  <Rle> <IRanges>  <Rle> |        <character>    <character>
 #      [1]          chr1   3073253      * | ENSMUSG00000102693  4933401J01Rik
 #      [2]          chr1   3102016      * | ENSMUSG00000064842        Gm26206
-#      [3]          chr1   3671498      * | ENSMUSG00000051951           Xkr4
-#      [4]          chr1   3252757      * | ENSMUSG00000102851        Gm18956
+
+### loading the peak-to-gene links from STEP2 ####
+load('E14_E16_new_proj_early_p2g')
+
+### get the candidate genes ####
+RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
+E_N_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$E_N >0)]
+AC_HC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' >0)]
+RGC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RGC >0)]
+Cone_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$Cone >0)]
+
+All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone_sp_Genes)
+All_genes_test = All_genes_test[!duplicated(All_genes_test)]
+
+### 
+Early_peak_gene_list = Selection_peaks_for_one(All_peaks_list,All_genes_test,E14_E16_new_proj_early_p2g,distance_F=100000,mm10_TSS_GR_all)
+
+### save the results ####
+save(Early_peak_gene_list,file='Early_peak_gene_list')
 
 ```
 
