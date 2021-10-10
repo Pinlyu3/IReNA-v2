@@ -687,4 +687,8 @@ Early_Feedback_res = Process_the_Feedback_res(Early_Feedback_res)
 ### save the feedback TF-TF pairs ####
 setwd('/zp1/data/plyu3/Human_retinal_scRNAseq')
 save(Early_Feedback_res,file='Early_Feedback_res')
+
+### there are 1158 feed-back TF pairs in early ####
+dim(Early_Feedback_res)[1]
+## [1] 1158 
 ```
