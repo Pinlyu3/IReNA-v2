@@ -280,8 +280,7 @@ library('GenomicRanges')
 source('Step4_functions.R')
 
 ### First read the fragment from the cellranger-atac ####
-
-### Get the single cell names for each cell type ###
+### Get the single cell names for each cell type ####
 ### Cell_names_list ####
 library('Seurat')
 load('/zp1/data/plyu3/Arrow_Project/New_Figure5_202009/E14_E16_ATAC_seurat')
@@ -575,12 +574,16 @@ library('GenomicRanges')
 library("TFBSTools")
 library("motifmatchr")
 library("Seurat")
+source('Step6_functions.R')
 
 #### loading the enriched genes from STEP1 #####
 load('Early_Diff_Genes_tab_202103')
 
 #### loading the PtoG links from STEP2 #####
 load('E14_E16_new_proj_early_p2g')
+
+#### loading the PtoG links from STEP3 #####
+load('Early_peak_gene_list')
 
 #### loading the footprint information from STEP4 ####
 #### for each cell type ####
@@ -601,23 +604,7 @@ head(out_all_ext)
 #2 M00002  Tcf3
 #3 M00004   Myb
 
-#### loading identified peaks #####
-#### these peaks have been classified to 3 classes #### 
-load('All_peaks_list_202009')
-names(All_peaks_list)
-#[1] "TSS"        "GeneBody"   "Intergenic"
-
-#### loading the TSS region #######
-load('mm10_TSS_GR_all_202009')
-head(mm10_TSS_GR_all)
-#GRanges object with 47729 ranges and 2 metadata columns:
-#               seqnames    ranges strand |            gene_id      gene_name
-#                  <Rle> <IRanges>  <Rle> |        <character>    <character>
-#      [1]          chr1   3073253      * | ENSMUSG00000102693  4933401J01Rik
-#      [2]          chr1   3102016      * | ENSMUSG00000064842        Gm26206
- 
-
-#### selecting the enriched genes in all the cell types ####
+#### get the enriched genes in all the cell types ####
 RPC_S2_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$RPC_S2 >0)]
 E_N_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$E_N >0)]
 AC_HC_sp_Genes = Early_Diff_Genes_tab$genes[which(Early_Diff_Genes_tab$'AC/HC' >0)]
@@ -628,10 +615,54 @@ All_genes_test = c(RPC_S2_sp_Genes,E_N_sp_Genes,AC_HC_sp_Genes,RGC_sp_Genes,Cone
 All_genes_test = All_genes_test[!duplicated(All_genes_test)]
 #### 
 
+#### combine peak-target links from STEP3, and cell-type specific TF-peak links from Step 4 ####
+#### STEP3 Early_peak_gene_list, STEP4 Early_*_footprints_cl ####
+RPC_Reg_motif = Reg_one_cells_RPC_MG(Early_RPCS2_footprints_cl,Early_peak_gene_list,out_all_ext,All_genes_test)
+EN_Reg_motif = Reg_one_cells_RPC_MG(Early_EN_footprints_cl,Early_peak_gene_list,out_all_ext,All_genes_test)
+ACHC_Reg_motif = Reg_one_cells_RPC_MG(Early_ACHC_footprints_cl,Early_peak_gene_list,out_all_ext,All_genes_test)
+RGC_Reg_motif = Reg_one_cells_RPC_MG(Early_RGC_footprints_cl,Early_peak_gene_list,out_all_ext,All_genes_test)
+Cone_Reg_motif = Reg_one_cells_RPC_MG(Early_Cone_footprints_cl,Early_peak_gene_list,out_all_ext,All_genes_test)
 
 
+#### Next, we classified these TF-peak-target relationships into activation or repression relationships based on the sign of the expression correlation between TF and target from STEP5: Early_Corr ####
+RPC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,RPC_Reg_motif,All_genes_test)
+EN_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,EN_Reg_motif,All_genes_test)
+ACHC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,ACHC_Reg_motif,All_genes_test)
+RGC_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,RGC_Reg_motif,All_genes_test)
+Cone_Reg_motif = Add_Cor_to_GRN_network_and_Filter(Early_Corr,Cone_Reg_motif,All_genes_test)
 
+#### filter TFs which are not enriched in that cell types ####
+f1 = which(RPC_Reg_motif$TFs %in% RPC_S2_sp_Genes == T)
+f2 = which(EN_Reg_motif$TFs %in% E_N_sp_Genes == T)
+f3 = which(ACHC_Reg_motif$TFs %in% AC_HC_sp_Genes == T)
+f4 = which(RGC_Reg_motif$TFs %in% RGC_sp_Genes == T)
+f5 = which(Cone_Reg_motif$TFs %in% Cone_sp_Genes == T)
 
+RPC_Reg_motif_cl = RPC_Reg_motif[f1,]
+EN_Reg_motif_cl = EN_Reg_motif[f2,]
+ACHC_Reg_motif_cl = ACHC_Reg_motif[f3,]
+RGC_Reg_motif_cl = RGC_Reg_motif[f4,]
+Cone_Reg_motif_cl = Cone_Reg_motif[f5,]
+
+#### we removed all the duplicated TF-target regulatory relationships for each cell type ####
+GRNs_list = list(RPC_Reg_motif_cl,EN_Reg_motif_cl,ACHC_Reg_motif_cl,RGC_Reg_motif_cl,Cone_Reg_motif_cl)
+names(GRNs_list) = c('RPCs','EN','ACHC','RGC','Cone')
+
+GRNs_list_cl = list()
+for(i in 1:length(Motif_list)){
+	print(i)
+	temp_list = Motif_list[[i]]
+	print(dim(temp_list))
+	index = which(duplicated(temp_list$index) == T)
+	temp_list_cl = temp_list[-index,]
+	print(dim(temp_list_cl))
+	Motif_list_cl = c(Motif_list_cl,list(temp_list_cl))
+}
+
+names(GRNs_list_cl) = names(GRNs_list)
+
+#### save the GRNs list ####
+save(GRNs_list_cl,file='Early_GRNs_list_cl')
 
 ```
 
