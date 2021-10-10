@@ -673,7 +673,7 @@ With the GRNs constructed in the previous steps, we searched for TF pairs connec
 library(GenomicRanges)
 source('Step7_functions.R')
 
-#### loading GRNs list ####
+#### loading GRNs list from STEP6 ####
 load('Early_GRNs_list_cl')
 
 #### searching feedback TF-TF pairs from GRNs list ####
