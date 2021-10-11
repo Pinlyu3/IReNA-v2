@@ -1,21 +1,21 @@
 #### found feedback pairs ####
 
 FoundFeedBackPairsOne <- function(tmp_motif1,tmp_motif2){
-	##### Pos ###############
+	##### tmp_motif1 ###############
 	k1 = which(tmp_motif1$Tag == 'pos')
 	k2 = which(tmp_motif1$Tag == 'neg')
 	tmp_motif1_pos = tmp_motif1[k1,]
 	tmp_motif1_neg = tmp_motif1[k2,]
-	##### Neg ###############
+	##### tmp_motif2 ###############
 	k3 = which(tmp_motif2$Tag == 'pos')
 	k4 = which(tmp_motif2$Tag == 'neg')
 	tmp_motif2_pos = tmp_motif2[k3,]
 	tmp_motif2_neg = tmp_motif2[k4,]
-	##### Pos pairs ##########
+	##### tmp_motif1_rev Target-TF ##########
 	Pos_index1_rev = paste(tmp_motif1_pos$Target,tmp_motif1_pos$TFs)
 	##### Overlapped only #########
 	Pos_index1_rev_index = which(Pos_index1_rev %in% tmp_motif2_pos$index == T)
-	print(length(Pos_index1_rev_index))
+	##### print(length(Pos_index1_rev_index))
 	if(length(Pos_index1_rev_index) > 0){
 		Pos_index1_rev_res = tmp_motif1_pos[Pos_index1_rev_index,]
 		Pos_index1_rev_res = Pos_index1_rev_res[!duplicated(Pos_index1_rev_res$index),]
@@ -26,7 +26,7 @@ FoundFeedBackPairsOne <- function(tmp_motif1,tmp_motif2){
 	##### Neg Pairs ##########
 	Neg_index1_rev = paste(tmp_motif1_neg$Target,tmp_motif1_neg$TFs)
 	Neg_index1_rev_index = which(Neg_index1_rev %in% tmp_motif2_neg$index == T)
-	print(length(Neg_index1_rev_index))
+	##### print(length(Neg_index1_rev_index))
 	if(length(Neg_index1_rev_index) > 0){
 		Neg_index1_rev_res = tmp_motif1_neg[Neg_index1_rev_index,]
 		Neg_index1_rev_res = Neg_index1_rev_res[!duplicated(Neg_index1_rev_res$index),]
@@ -52,22 +52,28 @@ FoundFeedBackPairs_new <- function(Motif_list){
 	######
 	for(i in 1:length(Motif_list)){
 		for(j in 1:length(Motif_list)){
+			#### print the index ####
 			print(c(i,j))
 			Names_1 = names(Motif_list)[i]
 			Names_2 = names(Motif_list)[j]
+			#### print the cell types ####
 			print(c(Names_1,Names_2))
 			tmp_motif1 = Motif_list[[i]]
 			tmp_motif2 = Motif_list[[j]]
-			#####
+			#### find feedback pairs between celltype A and B #####
 			tmp_out = FoundFeedBackPairsOne(tmp_motif1,tmp_motif2)
+			#### add annotations ####
 			tmp_out$celltypes = paste(Names_1,Names_2,sep=':')
 			tmp_out$TFs = paste(Names_1,tmp_out$TFs,sep=':')
 			tmp_out$Target = paste(Names_2,tmp_out$Target,sep=':')
+			#### return to list ####
 			Out_list = c(Out_list,list(tmp_out))
 		}
 	}
-	#######
+	####### list to the dataframe ####
 	Out_list_out = do.call("rbind",Out_list)
+	print(dim(Out_list_out))
+	return(Out_list_out)
 }
 
 
