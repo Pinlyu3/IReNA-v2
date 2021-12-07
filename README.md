@@ -649,14 +649,14 @@ GRNs_list = list(RPC_Reg_motif_cl,EN_Reg_motif_cl,ACHC_Reg_motif_cl,RGC_Reg_moti
 names(GRNs_list) = c('RPCs','EN','ACHC','RGC','Cone')
 
 GRNs_list_cl = list()
-for(i in 1:length(Motif_list)){
+for(i in 1:length(GRNs_list)){
 	print(i)
-	temp_list = Motif_list[[i]]
+	temp_list = GRNs_list[[i]]
 	print(dim(temp_list))
 	index = which(duplicated(temp_list$index) == T)
 	temp_list_cl = temp_list[-index,]
 	print(dim(temp_list_cl))
-	Motif_list_cl = c(Motif_list_cl,list(temp_list_cl))
+	GRNs_list_cl = c(GRNs_list_cl,list(temp_list_cl))
 }
 
 names(GRNs_list_cl) = names(GRNs_list)
