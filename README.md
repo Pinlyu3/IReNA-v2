@@ -78,7 +78,7 @@ E14_new_proj = ArchRProject(
 
 #### filted out the cells not in E14_E16_ATAC_seurat ####
 index = which(E14_E16_ATAC_seurat$orig.ident == 'E14')
-cellnames = rownames(E14_E16_ATAC_seurat)[index]
+cellnames = colnames(E14_E16_ATAC_seurat)[index]
 cellnames = gsub(':','#',cellnames)
 E14_new_proj_cl = Filter_proj(E14_new_proj,cellnames)
 
@@ -116,7 +116,7 @@ E16_new_proj = ArchRProject(
 
 #### filted out the cells not in E14_E16_ATAC_seurat ####
 index = which(E14_E16_ATAC_seurat$orig.ident == 'E16')
-cellnames = rownames(E14_E16_ATAC_seurat)[index]
+cellnames = colnames(E14_E16_ATAC_seurat)[index]
 cellnames = gsub(':','#',cellnames)
 E16_new_proj_cl = Filter_proj(E16_new_proj,cellnames)
 
@@ -678,7 +678,7 @@ load('Early_GRNs_list_cl')
 
 #### searching feedback TF-TF pairs from GRNs list ####
 #### one by one ####
-Early_Feedback_res = FoundFeedBackPairs_new(GRNs_list_cl)
+Early_Feedback_res = FoundFeedBackPairs_new(Early_GRNs_list_cl)
 Early_Feedback_res = Early_Feedback_res[order(Early_Feedback_res$Cor),]
 
 ### add annotations ####
